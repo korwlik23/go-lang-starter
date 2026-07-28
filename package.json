@@ -1,0 +1,25 @@
+{
+  "name": "go-lang-starter",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Development and release-contract tooling for the go-lang-starter suite.",
+  "type": "module",
+  "packageManager": "pnpm@11.9.0",
+  "engines": {
+    "node": ">=24.0.0 <25.0.0",
+    "pnpm": ">=11.0.0 <12.0.0"
+  },
+  "scripts": {
+    "test:release": "vitest run integration/tests/release",
+    "release:verify": "node scripts/release/verify-release.mjs",
+    "release:verify:all": "node scripts/release/verify-all.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.3",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "typescript": "7.0.2",
+    "vitest": "4.1.10",
+    "yaml": "2.9.0"
+  }
+}
