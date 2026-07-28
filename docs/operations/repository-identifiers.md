@@ -1,0 +1,104 @@
+# Repository and Release Identifiers
+
+- สถานะ: ยืนยัน identifiers, child local/remote `main` และ Gate 0 toolchain ครบแล้ว
+- วันที่ตรวจสอบ: 2026-07-28
+- Default branch convention: `main`
+
+## Git repositories
+
+```dotenv
+PARENT_REMOTE_URL=https://github.com/korwlik23/go-lang-starter.git
+API_REMOTE_URL=https://github.com/korwlik23/go-api-starter.git
+ADMIN_REMOTE_URL=https://github.com/korwlik23/vue-vite-admin-starter.git
+SITE_REMOTE_URL=https://github.com/korwlik23/astro-site-starter.git
+DEFAULT_BRANCH=main
+```
+
+GitHub repository metadata ยืนยันว่า repository ทั้งสี่เป็น public และผู้ใช้ปัจจุบันมี
+สิทธิ์ admin โดย parent remote ยังว่าง ส่วน child remotes ทั้งสามมี branch `main`:
+
+```dotenv
+PARENT_REMOTE_EMPTY=true
+API_REMOTE_HAS_MAIN=true
+ADMIN_REMOTE_HAS_MAIN=true
+SITE_REMOTE_HAS_MAIN=true
+```
+
+Parent remote อยู่ในสถานะที่ต้องการสำหรับนำ approved local design/plan เข้าเป็น
+initial commit ภายหลัง ส่วน child remotes ทั้งสามมี `refs/heads/main` และ SHA
+ตรงกับ local `HEAD`
+
+Local-first bootstrap สร้าง independent repositories ใน `api`, `admin`, `site`
+พร้อม clean `main`, exact `origin` และ commits ต่อไปนี้:
+
+| Child | Local `HEAD` | Remote `main` |
+|---|---|---|
+| API | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` |
+| Admin | `b71072a301a2444e787e7988f7f9628fdc1958b4` | `b71072a301a2444e787e7988f7f9628fdc1958b4` |
+| Site | `2c015d41c707ee46c3161f6231b4a38559495f75` | `2c015d41c707ee46c3161f6231b4a38559495f75` |
+
+ทั้งสาม commit ใช้ subject `chore: initialize repository` และมีเฉพาะ `README.md`
+ผู้ใช้ push จาก PowerShell ปกติสำเร็จ และ GitHub Commit API ยืนยัน exact SHA
+ตรง local HEAD ครบทุก repository
+
+## Go module
+
+ชื่อ module ผูกกับ canonical API repository:
+
+```dotenv
+GO_MODULE_PATH=github.com/korwlik23/go-api-starter
+```
+
+## OCI registry and images
+
+ใช้ GitHub Container Registry ภายใต้ GitHub owner เดียวกับ repositories:
+
+```dotenv
+OCI_REGISTRY_NAMESPACE=ghcr.io/korwlik23
+API_IMAGE_REPOSITORY=ghcr.io/korwlik23/go-api-starter
+ADMIN_IMAGE_REPOSITORY=ghcr.io/korwlik23/vue-vite-admin-starter
+SITE_IMAGE_REPOSITORY=ghcr.io/korwlik23/astro-site-starter
+```
+
+ค่านี้เป็น canonical repository name สำหรับ release contract เท่านั้น ยังไม่มีการ
+build, publish หรือเปลี่ยน visibility ของ container image
+
+## Application origins
+
+เฉพาะ Public Site ใช้ locale segment; Admin และ API แยก subdomain และไม่มี
+locale segment:
+
+```dotenv
+PUBLIC_ORIGIN=https://tewarach-dev.me
+ADMIN_ORIGIN=https://admin.tewarach-dev.me
+API_ORIGIN=https://api.tewarach-dev.me
+```
+
+Public routes เริ่มที่ `/{locale}/...`; root `/` ทำ locale negotiation แล้ว redirect
+ไป canonical localized URL
+
+## InfraStack contract source
+
+```dotenv
+INFRA_STACK_DIR=D:\infra-stack
+INFRA_STACK_REMOTE_URL=https://github.com/korwlik23/infra-stack.git
+INFRA_STACK_COMMIT=ee4df171bbc00783d2f560e8a907d60937e61782
+```
+
+Revision นี้เป็นฐานที่ใช้ตรวจ deployment contract ระหว่างการออกแบบ ไม่ได้ pin
+InfraStack ให้อยู่ revision นี้ตลอดไป ทุก implementation run ต้องตรวจ revision และ
+tracked worktree state ซ้ำก่อนแก้ integration contract
+
+## Gate status
+
+| Gate 0 check | Result |
+|---|---|
+| Exact URLs and identifiers recorded | PASS |
+| Parent remote reachable through GitHub integration and empty | PASS |
+| API local repository/initial commit | PASS — `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` |
+| Admin local repository/initial commit | PASS — `b71072a301a2444e787e7988f7f9628fdc1958b4` |
+| Site local repository/initial commit | PASS — `2c015d41c707ee46c3161f6231b4a38559495f75` |
+| API child has remote `refs/heads/main` | PASS — SHA ตรง local |
+| Admin child has remote `refs/heads/main` | PASS — SHA ตรง local |
+| Site child has remote `refs/heads/main` | PASS — SHA ตรง local |
+| Image publish, DNS or deployment performed | NO |
