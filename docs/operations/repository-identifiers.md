@@ -1,6 +1,7 @@
 # Repository and Release Identifiers
 
-- สถานะ: ยืนยัน identifiers, child local/remote `main` และ Gate 0 toolchain ครบแล้ว
+- สถานะ: ยืนยัน identifiers และ Gate 0 toolchain ครบแล้ว; local implementation
+  commits อาจอยู่หน้า remote จนกว่าจะได้รับอนุญาตให้ push
 - วันที่ตรวจสอบ: 2026-07-28
 - Default branch convention: `main`
 
@@ -24,22 +25,23 @@ ADMIN_REMOTE_HAS_MAIN=true
 SITE_REMOTE_HAS_MAIN=true
 ```
 
-Parent remote อยู่ในสถานะที่ต้องการสำหรับนำ approved local design/plan เข้าเป็น
-initial commit ภายหลัง ส่วน child remotes ทั้งสามมี `refs/heads/main` และ SHA
-ตรงกับ local `HEAD`
+Parent initial commits ถูกสร้างในเครื่องแล้วแต่ remote ยังว่างเพราะยังไม่ได้รับอนุญาต
+ให้ push ส่วน child remotes ทั้งสามมี bootstrap `refs/heads/main` ที่ตรวจตรงกับ local
+bootstrap commits ตอน Gate 0
 
 Local-first bootstrap สร้าง independent repositories ใน `api`, `admin`, `site`
 พร้อม clean `main`, exact `origin` และ commits ต่อไปนี้:
 
-| Child | Local `HEAD` | Remote `main` |
-|---|---|---|
-| API | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` |
-| Admin | `b71072a301a2444e787e7988f7f9628fdc1958b4` | `b71072a301a2444e787e7988f7f9628fdc1958b4` |
-| Site | `2c015d41c707ee46c3161f6231b4a38559495f75` | `2c015d41c707ee46c3161f6231b4a38559495f75` |
+| Child | Local `HEAD` | Remote `main` | State |
+|---|---|---|---|
+| API | `70a80780d377a983fa05c40ebde4bf6c37f03db4` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | ahead 3; not pushed |
+| Admin | `b71072a301a2444e787e7988f7f9628fdc1958b4` | `b71072a301a2444e787e7988f7f9628fdc1958b4` | synchronized |
+| Site | `2c015d41c707ee46c3161f6231b4a38559495f75` | `2c015d41c707ee46c3161f6231b4a38559495f75` | synchronized |
 
-ทั้งสาม commit ใช้ subject `chore: initialize repository` และมีเฉพาะ `README.md`
-ผู้ใช้ push จาก PowerShell ปกติสำเร็จ และ GitHub Commit API ยืนยัน exact SHA
-ตรง local HEAD ครบทุก repository
+Bootstrap commit ของทั้งสาม child ใช้ subject `chore: initialize repository` และมี
+เฉพาะ `README.md` ผู้ใช้ push จาก PowerShell ปกติสำเร็จ และ GitHub Commit API ยืนยัน
+exact bootstrap SHA ครบทุก repository หลังจากนั้น API เริ่ม Phase A ใน local commits
+โดยยังไม่ push
 
 ## Go module
 
@@ -98,7 +100,7 @@ tracked worktree state ซ้ำก่อนแก้ integration contract
 | API local repository/initial commit | PASS — `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` |
 | Admin local repository/initial commit | PASS — `b71072a301a2444e787e7988f7f9628fdc1958b4` |
 | Site local repository/initial commit | PASS — `2c015d41c707ee46c3161f6231b4a38559495f75` |
-| API child has remote `refs/heads/main` | PASS — SHA ตรง local |
+| API child has remote `refs/heads/main` | PASS — ตรง bootstrap SHA; local implementation ahead 3 |
 | Admin child has remote `refs/heads/main` | PASS — SHA ตรง local |
 | Site child has remote `refs/heads/main` | PASS — SHA ตรง local |
 | Image publish, DNS or deployment performed | NO |
