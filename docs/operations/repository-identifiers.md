@@ -34,7 +34,7 @@ Local-first bootstrap สร้าง independent repositories ใน `api`, `ad
 
 | Child | Local `HEAD` | Remote `main` | State |
 |---|---|---|---|
-| API | `ab9be2fdade7eb0ee12a8c94c9fad1dcd4e837d0` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | ahead 31; not pushed |
+| API | `9e5b1263ecc515f4e6e30d5d72b8092ff93e5f93` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | ahead 32; not pushed |
 | Admin | `b71072a301a2444e787e7988f7f9628fdc1958b4` | `b71072a301a2444e787e7988f7f9628fdc1958b4` | synchronized |
 | Site | `2c015d41c707ee46c3161f6231b4a38559495f75` | `2c015d41c707ee46c3161f6231b4a38559495f75` | synchronized |
 
@@ -100,7 +100,7 @@ tracked worktree state ซ้ำก่อนแก้ integration contract
 | API local repository/initial commit | PASS — `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` |
 | Admin local repository/initial commit | PASS — `b71072a301a2444e787e7988f7f9628fdc1958b4` |
 | Site local repository/initial commit | PASS — `2c015d41c707ee46c3161f6231b4a38559495f75` |
-| API child has remote `refs/heads/main` | PASS — ตรง bootstrap SHA; local implementation ahead 31 |
+| API child has remote `refs/heads/main` | PASS — ตรง bootstrap SHA; local implementation ahead 32 |
 | Admin child has remote `refs/heads/main` | PASS — SHA ตรง local |
 | Site child has remote `refs/heads/main` | PASS — SHA ตรง local |
 | Image publish, DNS or deployment performed | NO |
