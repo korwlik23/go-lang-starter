@@ -53,3 +53,26 @@ export async function verifyContractArtifact({ artifact, rootDirectory }) {
     sha256,
   };
 }
+
+export async function verifyManifestContracts({ manifest, rootDirectory }) {
+  const artifacts = [
+    ["contracts.openapi.admin", manifest.contracts.openapi.admin],
+    ["contracts.openapi.public", manifest.contracts.openapi.public],
+    ["contracts.openapi.siteServer", manifest.contracts.openapi.siteServer],
+    ["contracts.localizationCatalog", manifest.contracts.localizationCatalog],
+    ["infraStack.deployScript", manifest.infraStack.deployScript],
+  ];
+  const results = [];
+
+  for (const [name, artifact] of artifacts) {
+    results.push({
+      name,
+      ...(await verifyContractArtifact({
+        artifact,
+        rootDirectory,
+      })),
+    });
+  }
+
+  return results;
+}
