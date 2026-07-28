@@ -389,6 +389,10 @@ PostgreSQL ก่อนเพิ่ม migration ใด ๆ และ XAMPP comm
 `{dialect}` ด้านล่างหมายถึง exact sibling directories `postgres`, `mariadb`, `mysql`;
 initial migrations เป็น additive เท่านั้น Production rollback ไม่รัน down อัตโนมัติ
 
+ลำดับ executable สำหรับสามแถวแรกคือ `M1 → M3 → M2`: `accounts` เป็น module
+dependent ของ `identity` จึงต้องมี `users` schema จริงก่อนที่ `memberships.user_id`
+จะสร้าง FK; ID ด้านล่างเป็น task identifiers ไม่ใช่ global migration order
+
 | ID | Test file | Exact migration files | Required schema assertion |
 |---|---|---|---|
 | M1 | `api/tests/migrations/accounts_test.go` | `api/internal/modules/accounts/migrations/{dialect}/000001_create_accounts.sql` | UUID/engine-safe ID, unique slug, status, timestamps |
