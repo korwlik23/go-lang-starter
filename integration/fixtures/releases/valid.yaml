@@ -8,7 +8,7 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 70a80780d377a983fa05c40ebde4bf6c37f03db4
+    commit: 6481326c256bb2f83e5f26dbcb83800e9029aa61
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
