@@ -1,0 +1,9 @@
+[submodule "api"]
+	path = api
+	url = https://github.com/korwlik23/go-api-starter.git
+[submodule "admin"]
+	path = admin
+	url = https://github.com/korwlik23/vue-vite-admin-starter.git
+[submodule "site"]
+	path = site
+	url = https://github.com/korwlik23/astro-site-starter.git
