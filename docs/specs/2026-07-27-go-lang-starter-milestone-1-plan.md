@@ -327,14 +327,31 @@ Executable command convention:
 - **Expected GREEN:** unsafe/default/XAMPP application database ถูก reject; dedicated
   test database ผ่าน
 
-### Task D0.3 — Profile test runners `[S][CFG]`
+### Task D0.3 — Profile test runners `[S][TDD]`
 
-- **Files:** `api/scripts/test-db.ps1`, `api/scripts/test-db.sh`
-- **Change:** start/await selected disposable container หรือรับ explicit XAMPP test DSN,
-  call D0.2 guard ก่อน `down/reset`, propagate exit code และไม่ลบ volume โดยปริยาย
-- **Verify:** dry-run ทั้ง `postgres`, `mariadb`, `mariadb-xampp`; unknown profile fail
-- **XAMPP rule:** ห้ามชี้ database เดิมของผู้ใช้ ต้องสร้าง dedicated name ตาม prefix และ
-  ส่ง `ALLOW_TEST_DATABASE_RESET=1` แบบ explicit ต่อ test run
+- **Files:** `api/.gitignore`, `api/compose.dev.yml`,
+  `api/scripts/test-db.ps1`, `api/scripts/test-db.sh`,
+  `api/scripts/test_db_bash_test.go`,
+  `api/scripts/test_db_helpers_test.go`,
+  `api/scripts/test_db_powershell_test.go`,
+  `api/tests/testsupport/cmd/database-guard/main_test.go`,
+  `api/tests/testsupport/cmd/database-guard/main.go`
+- **Change:** เพิ่ม pinned read-only `go-test` container บน internal database network;
+  start/await selected disposable container หรือรับ explicit XAMPP connection fields
+  โดย password ส่งผ่านชื่อ environment variable ไม่ส่ง raw secret บน command line;
+  test-only CLI ต้องเรียก D0.2 guard ชุดเดียวกันก่อน migration tests, scripts ต้อง
+  propagate test exit code, หยุดเฉพาะ service ที่ตนเริ่ม และไม่ใช้ `down`/ลบ volume
+- **TDD:** `go test ./tests/testsupport/cmd/database-guard -run '^TestD0_3$' -count=1`;
+  RED = CLI adapter ยังไม่มี, GREEN = safe config ผ่านและ unsafe/mismatch errors
+  ไม่ echo database/password/authorization
+- **Runner regression:** `go test ./scripts -count=1`; ต้อง cleanup เมื่อ start/health
+  ล้มเหลว, await service เดิมโดยไม่ stop, reject path traversal และใช้ per-profile
+  single-flight lock ข้าม PowerShell/Bash
+- **Verify:** syntax/static check และ dry-run ทั้ง `postgres`, `mariadb`,
+  `mariadb-xampp`; unknown profile fail ก่อนเรียก external command
+- **XAMPP rule:** ห้ามชี้ database เดิมของผู้ใช้ ต้องใช้ local host,
+  dedicated name ตาม prefix และส่ง `ALLOW_TEST_DATABASE_RESET=1` แบบ explicit ต่อ
+  test run; password อ่านจาก environment ที่ระบุและ dry-run ต้องแสดง `[REDACTED]`
 
 คำสั่ง migration row มาตรฐาน:
 
