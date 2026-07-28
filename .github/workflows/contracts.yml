@@ -1,0 +1,83 @@
+name: Contracts
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/contracts.yml"
+      - ".gitmodules"
+      - "integration/**"
+      - "releases/**"
+      - "scripts/release/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vitest.config.ts"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/contracts.yml"
+      - ".gitmodules"
+      - "integration/**"
+      - "releases/**"
+      - "scripts/release/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "vitest.config.ts"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: contracts-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Verify release contracts
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Check out suite and submodules
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Fetch child tags
+        run: git submodule foreach --recursive 'git fetch --force --prune --tags'
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+        with:
+          run_install: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+          node-version: "24"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run release verifier tests
+        run: pnpm test:release
+
+      - name: Verify the integration fixture
+        run: pnpm release:verify -- integration/fixtures/releases/valid.yaml
+
+      - name: Verify real release manifests
+        shell: bash
+        run: |
+          mapfile -t manifests < <(
+            find releases -maxdepth 1 -type f -name 'suite-v*.yaml' -print | sort
+          )
+          if (( ${#manifests[@]} == 0 )); then
+            echo "No real release manifests exist yet; fixture verification is authoritative."
+            exit 0
+          fi
+          pnpm release:verify:all -- "${manifests[@]}" --release
