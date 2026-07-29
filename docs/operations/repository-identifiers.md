@@ -34,7 +34,7 @@ Local-first bootstrap สร้าง independent repositories ใน `api`, `ad
 
 | Child | Local `HEAD` | Remote `main` | State |
 |---|---|---|---|
-| API | `ba818d6d483267d31f81df9947a14fa627e3a76e` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | ahead 54; not pushed |
+| API | `ba818d6f5430b3c009a4b64b6b882307dc6380cd` | `6e68ebdd4356b4dcb145ab6c69ec4abf8e2b2b31` | ahead 54; not pushed |
 | Admin | `b71072a301a2444e787e7988f7f9628fdc1958b4` | `b71072a301a2444e787e7988f7f9628fdc1958b4` | synchronized |
 | Site | `2c015d41c707ee46c3161f6231b4a38559495f75` | `2c015d41c707ee46c3161f6231b4a38559495f75` | synchronized |
 
