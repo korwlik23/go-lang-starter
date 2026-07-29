@@ -15,7 +15,7 @@ components:
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: b71072a301a2444e787e7988f7f9628fdc1958b4
+    commit: f869cd35baf3c459cd8a5f18e795295c674d5f3b
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
