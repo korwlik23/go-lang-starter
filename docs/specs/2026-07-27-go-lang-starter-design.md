@@ -796,7 +796,10 @@ Current contract gaps:
   code ที่ deploy ใช้ image digest ชุดเดียวกัน
 - การเพิ่ม generic `MIGRATE_SERVICE` เป็นงาน InfraStack แยก
 - ชื่อ database ต้อง sanitize `-` เป็น `_` หรือระบุ explicit DB name
-- Production ใช้ per-project DB/object-storage credentials
+- Production ใช้ per-project DB/object-storage credentials; ภายในแต่ละ project แยก
+  DB runtime, migration และ disabled-by-default retention principals โดย runtime ไม่มี
+  audit `UPDATE`/`DELETE`/`TRUNCATE`/DDL privileges และ migration/retention credentials
+  ไม่ถูกส่งเข้า API container
 - Security header middleware ต้อง attach ให้ public routers
 - Prometheus ต้องเพิ่ม app target
 - InfraStack ปัจจุบันไม่มี MariaDB/Oracle MySQL service หรือ backup pipeline

@@ -411,8 +411,53 @@ dependent ของ `identity` จึงต้องมี `users` schema จร
 | M14 | `api/tests/migrations/locales{,_behavior,_constraints,_fallback,_state}_test.go` | `api/internal/modules/localization/migrations/{dialect}/000001_create_locales.sql` | exact 11 columns: UUID identity, unique normalized lowercase ASCII tag (product cap 255), Unicode name, exact ltr/rtl, nullable restrictive self-FK สำหรับ explicit UI fallback, safe-false enabled/selectable flags, positive optimistic version และ nullable unique singleton marker ที่ enforce at-most-one enabled fallback-root default; ไม่มี seed |
 | M15 | `api/tests/migrations/translations{,_behavior,_constraints,_delete_policy,_version}_test.go` | `api/internal/modules/localization/migrations/{dialect}/000002_create_translations.sql` | exact 8-column system catalog override: restrictive locale FK + natural PK `(locale_id, category, translation_key)`, normalized lowercase ASCII category/key, nullable `value` ที่ใช้ `NULL` เป็น reset tombstone และ non-empty active value จำกัด 16 KiB, server-assigned `source` exact `editor|import`, positive monotonic optimistic version/timestamps; ไม่มี account/surrogate/seed/extra index |
 | M16 | `api/tests/migrations/locale_preferences{,_behavior,_constraints,_delete_policy,_state}_test.go` | `api/internal/modules/localization/migrations/{dialect}/000003_create_user_locale_preferences.sql` | exact 5-column per-user header `(user_id, all_languages, version, timestamps)` โดย boolean ไม่มี default, version > 0 และ updated >= created + exact 2-column natural-PK locale selection mapping; exact boolean มีเพียง dynamic-all/explicit-subset, user/header deletion cascade, locale lifecycle restrictive, reverse locale index, no account/surrogate/order/seed; missing header lazily resolvesเป็น all/version 0, while all-zero-child/subset-nonempty + enabled/selectable eligibility are transactional application invariants |
-| M17 | `api/tests/migrations/audit_events_test.go` | `api/internal/modules/audit/migrations/{dialect}/000001_create_audit_events.sql` | append-only event data, `system`/`account` scope, nullable account for system events, actor/operation/request indexes |
+| M17 | `api/tests/migrations/audit_events{,_behavior,_constraints,_delete_policy}_test.go` | `api/internal/modules/audit/migrations/{dialect}/000001_create_audit_events.sql` | exact 11-column append-only envelope; `system`/`account` scope XOR, typed actor shape, restrictive account/user provenance, canonical JSON-object text limited to 16 KiB, separate trusted event/DB-recorded timestamps และ exact account/actor/operation/request/retention indexes; ไม่มี seed/outcome column/action index |
 | M18 | `api/tests/migrations/module_states_test.go` | `api/internal/modules/operations/migrations/{dialect}/000001_create_module_states.sql` | module/config/catalog checksums, enabled state, monotonic catalog epoch + reconcile revision สำหรับ CAS ป้องกัน stale deployment และ reconciled timestamp |
+
+#### M17 locked audit migration contract
+
+- **Files and responsibilities:** `audit_events_test.go` owns lifecycle, exact schema, parity,
+  parent snapshots and static Oracle MySQL guards; `_behavior_test.go` owns valid event shapes,
+  stable ordering and non-unique correlations; `_constraints_test.go` owns required values,
+  exact binary grammars, JSON-object/byte bounds and non-strict MySQL truncation defenses;
+  `_delete_policy_test.go` owns restrictive provenance and independent-parent controls. Each
+  dialect migration owns only the additive `audit_events` DDL and its rollback.
+- **Migration dependency:** the audit migration module has exact required dependencies on
+  `accounts` and `identity`; M17 integration setup migrates both parents before audit and
+  MR11E asserts the production manifest graph so alphabetical module ordering can never run
+  the audit FK migration before either parent table exists.
+- **Exact columns:** `id`, `scope`, `account_id`, `actor_type`, `actor_id`, `action`,
+  `operation_id`, `request_id`, `event_data`, `occurred_at`, `recorded_at`. UUID values use
+  PostgreSQL `UUID` and MySQL-family `BINARY(16)`. `occurred_at` is trusted server event time
+  with no database default; `recorded_at` is database ingestion time with a microsecond
+  `CURRENT_TIMESTAMP` default and is the retention/cursor anchor.
+- **Shape invariants:** binary `scope` is exactly `system|account`; only account scope has a
+  non-null `account_id`. Binary `actor_type` is exactly `system|user|anonymous`; only `user`
+  has a non-null `actor_id`. Scope and actor are independent. `action` is a lowercase
+  dotted ASCII key with at least two segments; each starts with `a-z` and continues with
+  lowercase ASCII alphanumerics, with the full key capped at 128 bytes.
+  `operation_id` is required and
+  non-unique. `request_id` is nullable, untrusted correlation data using the middleware
+  ASCII grammar capped at 128 bytes and is never authorization/idempotency evidence.
+- **Payload contract:** `event_data` is non-null canonical UTF-8 JSON text containing one
+  object and capped at 16 KiB by byte length. The database validates object shape and byte
+  size; AU1/AU3 own duplicate-key rejection, canonical serialization, typed per-action
+  allowlists, nested bounds and secret/PII redaction. Action-specific `outcome_code` stays in
+  typed event data because no universal outcome state exists.
+- **Integrity and indexes:** account and user FKs are restrictive; audit never cascades or
+  mutates on parent lifecycle. Hard-delete of a referenced user/account is blocked until a
+  privileged retention purge removes eligible audit rows; normal lifecycle soft-disables
+  principals. Exact secondary indexes are `(account_id, recorded_at, id)`,
+  `(actor_id, actor_type, account_id, recorded_at, id)`,
+  `(account_id, operation_id, recorded_at, id)`,
+  `(account_id, request_id, recorded_at, id)` and `(recorded_at, id)`. An action index is
+  deferred until AU2 defines a measured read pattern.
+- **Append-only boundary:** M17 does not add mutation triggers and therefore proves schema
+  integrity only, not database-level immutability. AU2 exposes append and separately scoped
+  account/system reads without update/delete. C5.1D provisions separate runtime, migration
+  and retention principals; only after that gate may production claim database-enforced
+  append-only access. Security-sensitive mutation and audit append share one transaction and
+  fail closed before commit.
 
 - **Lane verification:** PostgreSQL และ MariaDB `up -> down -> up`, repository ping,
   schema assertions และ parity exit `0`
@@ -605,7 +650,7 @@ Bundled examples แยกหมวดใน:
 | MR11B `[TDD]` Accounts manifest | `api/internal/app/modules_test.go` | `api/internal/modules/accounts/manifest.go`, `api/internal/modules/accounts/permissions.go` | Accounts depends/permission catalog canonical และปิดไม่ได้ |
 | MR11C `[TDD]` Authorization manifest | `api/internal/app/modules_test.go` | `api/internal/modules/authorization/manifest.go`, `api/internal/modules/authorization/permissions.go` | Authorization dependencies/system scopes canonical และปิดไม่ได้ |
 | MR11D `[TDD]` Localization manifest | `api/internal/app/modules_test.go` | `api/internal/modules/localization/manifest.go`, `api/internal/modules/localization/permissions.go` | มี `localization.locales.manage.system`/`localization.translations.update.system`, dependenciesถูกและปิดไม่ได้ |
-| MR11E `[TDD]` Audit manifest | `api/internal/app/modules_test.go` | `api/internal/modules/audit/manifest.go`, `api/internal/modules/audit/permissions.go` | Audit append capability/permission catalog canonical และปิดไม่ได้ |
+| MR11E `[TDD]` Audit manifest | `api/internal/app/modules_test.go` | `api/internal/modules/audit/manifest.go`, `api/internal/modules/audit/permissions.go` | Audit append capability/permission catalog canonical, ปิดไม่ได้ และมี exact migration dependencies `accounts` + `identity` เพื่อให้ FK parents พร้อมก่อน audit migrate |
 | MR11F `[TDD]` Operations manifest | `api/internal/app/modules_test.go` | `api/internal/modules/operations/manifest.go`, `api/internal/modules/operations/permissions.go` | Operations module-state route/permissions canonical และปิดไม่ได้; registry ไม่มี settings/default/optional skeleton |
 
 - **Verify:** `cd api; go test ./internal/modular/... ./internal/modules/operations/... ./tests/security/... -race -count=1; go build ./cmd/migrate`
@@ -617,15 +662,15 @@ Bundled examples แยกหมวดใน:
 
 | ID | Test file | Implementation files | Behavior |
 |---|---|---|---|
-| AU1 `[TDD]` safe audit event | `api/internal/modules/audit/domain/event_test.go` | `api/internal/modules/audit/domain/event.go`, `api/internal/modules/audit/application/append_event.go`, `api/internal/modules/audit/ports/event_repository.go` | require action, typed actor, operation ID และ time; `account` scope ต้องมี account ID แต่ `system` scope ต้องไม่มี; HTTP event เพิ่ม request ID; reject password/cookie/token/secret fields |
-| AU2 `[TDD]` append repository | `api/internal/modules/audit/adapters/gorm/event_repository_test.go` | `api/internal/modules/audit/adapters/gorm/event_repository.go` | append/read only; application port ไม่ expose update/delete |
+| AU1 `[TDD]` safe audit event | `api/internal/modules/audit/domain/event_test.go` | `api/internal/modules/audit/domain/event.go`, `api/internal/modules/audit/application/append_event.go`, `api/internal/modules/audit/ports/event_repository.go` | require action, typed actor และ server-generated operation ID; injected server Clock กำหนด `occurred_at`, HTTP/client DTO override time/actor/scope/account/operation/`recorded_at` ไม่ได้ และ repository ไม่เขียน `recorded_at`; `account` scope ต้องมี trusted resolved account ID แต่ `system` scope ต้องไม่มี; HTTP event เพิ่ม untrusted request ID; typed payload allowlist + nested bounds reject password/cookie/token/secret/PII fields |
+| AU2 `[TDD]` append repository | `api/internal/modules/audit/adapters/gorm/event_repository_test.go` | `api/internal/modules/audit/adapters/gorm/event_repository.go` | port expose only `Append`, `ListAccount(resolvedAccountID, cursor, limit)` และ permission-protected `ListSystem(cursor, limit)`; ไม่มี generic unscoped list/update/delete, every cursor uses `(recorded_at,id)`, account/system query isolation และ repository insert omits `recorded_at` |
 | AU3A `[TDD]` login audit | `api/tests/security/audit_login_test.go` | `api/internal/modules/identity/application/auth/login.go` | ทุก login outcome append sanitized event พร้อม request ID และ outcome code โดยไม่เก็บ credential/IP ดิบ |
 | AU3B `[TDD]` session audit | `api/tests/security/audit_session_test.go` | `api/internal/modules/identity/application/session/revoke.go` | logout/self/other-session revoke append action และ target session fingerprint ที่ไม่ใช่ raw token |
 | AU3C `[TDD]` authorization audit | `api/tests/security/audit_authorization_test.go` | `api/internal/modules/authorization/application/grant_role_permission.go`, `api/internal/modules/authorization/application/assign_role.go`, `api/internal/modules/authorization/application/revoke_role.go` | successful grant/assign/revoke append before/after identifiers และ affected-principal count; denied changeไม่บันทึกเป็น success |
 | AU3D `[TDD]` bootstrap audit | `api/tests/security/audit_bootstrap_test.go` | `api/internal/app/bootstrap.go` | first bootstrap append actor/account/role creation event; idempotent rerunไม่สร้าง duplicate success event |
 | AU3E `[TDD]` locale lifecycle audit | `api/tests/security/audit_locale_test.go` | `api/internal/modules/localization/application/initialize_locales.go`, `api/internal/modules/localization/application/create_locale.go`, `api/internal/modules/localization/application/update_locale.go`, `api/internal/modules/localization/application/set_default_locale.go` | initialization ใช้ system actor/scope + operation ID โดยไม่มี account; create/update/enable/selectable/default changes ใช้ account/system context ตาม operation และไม่เก็บ translated values |
 | AU3F `[TDD]` catalog audit | `api/tests/security/audit_catalog_test.go` | `api/internal/modules/localization/application/catalog/update.go` | catalog edit append locale/category/key/version และไม่เก็บ translation body |
-| AU3G `[TDD]` module reconcile audit | `api/tests/security/audit_module_test.go` | `api/internal/modules/operations/application/reconcile_modules.go` | pre-bootstrap reconcile ใช้ system actor/scope + operation ID โดยไม่มี account และ append previous/new checksum หลัง transaction สำเร็จ |
+| AU3G `[TDD]` module reconcile audit | `api/tests/security/audit_module_test.go` | `api/internal/modules/operations/application/reconcile_modules.go` | pre-bootstrap reconcile ใช้ system actor/scope + operation ID โดยไม่มี account; หลัง reconcile logic สำเร็จต้อง append previous/new checksum ภายใน transaction เดียวก่อน commit และ audit failure rollback mutation ทั้งหมด |
 | AU3H `[TDD]` MFA enrollment audit | `api/tests/security/audit_mfa_enroll_test.go` | `api/internal/modules/identity/application/mfa/enroll.go` | enroll/confirm outcome append action โดยไม่เก็บ TOTP secret/code/recovery hash |
 | AU3I `[TDD]` MFA verification audit | `api/tests/security/audit_mfa_verify_test.go` | `api/internal/modules/identity/application/mfa/verify.go` | TOTP/recovery-code outcome append method + result โดยไม่เก็บ code/hash |
 | AU3J `[TDD]` recovery-request audit | `api/tests/security/audit_recovery_request_test.go` | `api/internal/modules/identity/application/auth/request_recovery.go` | request outcome append generic action + normalized-subject fingerprint โดยไม่เปิดเผยว่าบัญชีมีอยู่หรือ token ใดถูกออก |
@@ -920,6 +965,29 @@ docker image inspect --format '{{.Config.User}}|{{json .Config.ExposedPorts}}|{{
   `cap_drop: [ALL]`, `no-new-privileges` และ resource limits
 - **Verify:** render template; ไม่มี `backend`, host port หรือ `container_name`;
   hardening fields ครบ
+
+### Task C5.1D — Database principal separation and audit grants `[S][SEC][CFG]`
+
+- **Files:** `integration/tests/database-access-contract.test.ts`,
+  `ops/infra-stack/api/docker-compose.yml`, `ops/infra-stack/api/.env.example`,
+  `ops/database/access/{postgres,mariadb,mysql}.sql.tmpl`,
+  `scripts/render-database-access.mjs`, `docs/operations/database-access.md`
+- **Change:** render dialect-specific grants from strictly validated project/role identifiers
+  without accepting SQL fragments or secrets. API and `api-migrate` receive distinct runtime
+  and migration credentials mapped into their own `DB_USER`/`DB_PASSWORD`; the disabled-by-
+  default retention principal is separate. Runtime receives normal application DML but only
+  `INSERT` plus `SELECT` on `audit_events`—never `UPDATE`, `DELETE`, `TRUNCATE`, DDL or trigger
+  privileges; AU2, not the table grant, enforces bounded account/system reads. Migration owns
+  DDL and retention owns bounded purge only; neither is exposed to the runtime container.
+- **Verify:** render templates for all declared dialects; disposable PostgreSQL/MariaDB and
+  available Oracle MySQL fixtures create three test principals, apply the rendered policy,
+  then prove runtime audit insert/select succeeds while audit update/delete/truncate and
+  schema changes fail, migration can migrate but is not used by API, and retention can
+  bounded-delete eligible rows without DDL. AU2 tests prove query scoping. Deployment
+  preflight rejects equal principals, missing credentials or leaked migration/retention
+  variables in the API service.
+- **Pass:** production documentation may call audit storage database-enforced append-only
+  only after this gate; otherwise it must say application-append-only.
 
 production CLI contract ของ wrapper คือ:
 
