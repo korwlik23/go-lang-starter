@@ -98,7 +98,7 @@ describe("release submodule pins", () => {
           tag: "v0.1.0",
         },
         site: {
-          commit: "2c015d41c707ee46c3161f6231b4a38559495f75",
+          commit: "88c3f1a6093e8764f707f712d1c76f361951dfcc",
           path: "site",
           tag: "v0.1.0",
         },
@@ -110,7 +110,7 @@ describe("release submodule pins", () => {
     expect(results.map((result) => result.gitlinkCommit)).toEqual([
       "f869cd35baf3c459cd8a5f18e795295c674d5f3b",
       "71a668a7a48ff145c4b776718db8e74aea327aa2",
-      "2c015d41c707ee46c3161f6231b4a38559495f75",
+      "88c3f1a6093e8764f707f712d1c76f361951dfcc",
     ]);
     expect(results.every((result) => result.headCommit === result.gitlinkCommit)).toBe(
       true,

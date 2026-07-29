@@ -22,7 +22,7 @@ components:
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 2c015d41c707ee46c3161f6231b4a38559495f75
+    commit: 88c3f1a6093e8764f707f712d1c76f361951dfcc
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:
