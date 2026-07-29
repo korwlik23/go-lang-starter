@@ -412,7 +412,7 @@ dependent ของ `identity` จึงต้องมี `users` schema จร
 | M15 | `api/tests/migrations/translations{,_behavior,_constraints,_delete_policy,_version}_test.go` | `api/internal/modules/localization/migrations/{dialect}/000002_create_translations.sql` | exact 8-column system catalog override: restrictive locale FK + natural PK `(locale_id, category, translation_key)`, normalized lowercase ASCII category/key, nullable `value` ที่ใช้ `NULL` เป็น reset tombstone และ non-empty active value จำกัด 16 KiB, server-assigned `source` exact `editor|import`, positive monotonic optimistic version/timestamps; ไม่มี account/surrogate/seed/extra index |
 | M16 | `api/tests/migrations/locale_preferences{,_behavior,_constraints,_delete_policy,_state}_test.go` | `api/internal/modules/localization/migrations/{dialect}/000003_create_user_locale_preferences.sql` | exact 5-column per-user header `(user_id, all_languages, version, timestamps)` โดย boolean ไม่มี default, version > 0 และ updated >= created + exact 2-column natural-PK locale selection mapping; exact boolean มีเพียง dynamic-all/explicit-subset, user/header deletion cascade, locale lifecycle restrictive, reverse locale index, no account/surrogate/order/seed; missing header lazily resolvesเป็น all/version 0, while all-zero-child/subset-nonempty + enabled/selectable eligibility are transactional application invariants |
 | M17 | `api/tests/migrations/audit_events{,_behavior,_constraints,_delete_policy}_test.go` | `api/internal/modules/audit/migrations/{dialect}/000001_create_audit_events.sql` | exact 11-column append-only envelope; `system`/`account` scope XOR, typed actor shape, restrictive account/user provenance, canonical JSON-object text limited to 16 KiB, separate trusted event/DB-recorded timestamps และ exact account/actor/operation/request/retention indexes; ไม่มี seed/outcome column/action index |
-| M18 | `api/tests/migrations/module_states_test.go` | `api/internal/modules/operations/migrations/{dialect}/000001_create_module_states.sql` | module/config/catalog checksums, enabled state, monotonic catalog epoch + reconcile revision สำหรับ CAS ป้องกัน stale deployment และ reconciled timestamp |
+| M18 | `api/tests/migrations/module_states{,_behavior,_constraints,_state}_test.go` | `api/internal/modules/operations/migrations/{dialect}/000001_create_module_states.sql` | exact 8-column system-owned per-module state: canonical module ID, explicit enabled state, 3 exact SHA-256 checksums, positive catalog epoch/reconcile revision, database-recorded reconciliation time and only PK index; no account/FK/seed/singleton row |
 
 #### M17 locked audit migration contract
 
@@ -458,6 +458,29 @@ dependent ของ `identity` จึงต้องมี `users` schema จร
   and retention principals; only after that gate may production claim database-enforced
   append-only access. Security-sensitive mutation and audit append share one transaction and
   fail closed before commit.
+
+#### M18 locked module-state migration contract
+
+- **Files and responsibilities:** `module_states_test.go` owns lifecycle, exact schema,
+  three-dialect parity and no-seed rollback; `_behavior_test.go` owns valid independent
+  module records and database-recorded timestamps; `_constraints_test.go` owns module ID,
+  boolean, checksum and non-strict MySQL bounds; `_state_test.go` owns positive epoch/revision
+  and no-default controls. Each dialect migration owns only additive `module_states` DDL and
+  its rollback.
+- **Exact columns:** `module_id`, `enabled`, `module_checksum`, `config_checksum`,
+  `catalog_checksum`, `catalog_epoch`, `reconcile_revision`, `reconciled_at`. `module_id`
+  follows the existing safe migration module grammar: lowercase ASCII, starts with `a-z`,
+  then `a-z0-9_`, max 40 bytes. The three checksums are exact 32-byte SHA-256 values;
+  PostgreSQL uses `BYTEA`, MySQL-family uses physical `VARBINARY(64)` plus a 32-byte check so
+  non-strict mode cannot silently pad/truncate an invalid hash into a valid value. `enabled` has no default and is
+  binary boolean. Epoch and revision are `BIGINT > 0` with no default. `reconciled_at` is
+  database-recorded UTC-capable microsecond time with a current-timestamp default.
+- **State contract:** this migration does not seed, hardcode, or designate a module. Every
+  row is one independent module projection and uses `module_id` as the sole primary key; it
+  has no account, FK, surrogate identity or secondary index. MR4 owns the global advisory
+  lock, expected-revision CAS, atomic exact-set reconciliation and monotonic epoch/revision
+  transition. Direct schema writes can reject invalid/non-positive state but cannot prove
+  cross-row monotonicity, so no trigger or speculative singleton is added here.
 
 - **Lane verification:** PostgreSQL และ MariaDB `up -> down -> up`, repository ping,
   schema assertions และ parity exit `0`
