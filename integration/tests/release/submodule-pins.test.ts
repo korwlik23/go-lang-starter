@@ -88,7 +88,7 @@ describe("release submodule pins", () => {
     const results = await verifySubmodulePins({
       components: {
         api: {
-          commit: "a37668ff4ce5856b9faf93aadb732eecc347d546",
+          commit: "e25199d34bcf20c676e83038c75eaf0c9fa0cb94",
           path: "api",
           tag: "v0.1.0",
         },
@@ -109,7 +109,7 @@ describe("release submodule pins", () => {
     expect(results).toHaveLength(3);
     expect(results.map((result) => result.gitlinkCommit)).toEqual([
       "b71072a301a2444e787e7988f7f9628fdc1958b4",
-      "a37668ff4ce5856b9faf93aadb732eecc347d546",
+      "e25199d34bcf20c676e83038c75eaf0c9fa0cb94",
       "2c015d41c707ee46c3161f6231b4a38559495f75",
     ]);
     expect(results.every((result) => result.headCommit === result.gitlinkCommit)).toBe(
