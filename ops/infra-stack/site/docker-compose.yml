@@ -1,0 +1,32 @@
+services:
+  site:
+    image: ${APP_IMAGE_DIGEST_REF:?set APP_IMAGE_DIGEST_REF}
+    restart: unless-stopped
+    user: "1000:1000"
+    environment:
+      SITE_API_BASE_URL: ${SITE_API_BASE_URL:?set SITE_API_BASE_URL}
+      PUBLIC_SITE_URL: ${PUBLIC_SITE_URL:?set PUBLIC_SITE_URL}
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 384M
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.go-lang-site.rule=Host(`${APP_DOMAIN:?set APP_DOMAIN}`)
+      - traefik.http.routers.go-lang-site.entrypoints=websecure
+      - traefik.http.routers.go-lang-site.tls.certresolver=letsencrypt
+      - traefik.http.routers.go-lang-site.middlewares=security-headers@file
+      - traefik.http.services.go-lang-site.loadbalancer.server.port=4321
+      - traefik.http.services.go-lang-site.loadbalancer.healthcheck.path=/healthz
+      - traefik.http.services.go-lang-site.loadbalancer.healthcheck.interval=10s
+    networks: [proxy]
+
+networks:
+  proxy:
+    external: true
