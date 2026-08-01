@@ -88,17 +88,17 @@ describe("release submodule pins", () => {
     const results = await verifySubmodulePins({
       components: {
         api: {
-          commit: "270a564183ac3b26868717cf6d18431bbbdf5ae2",
+          commit: "3dcc60d295875a2d101f321f30d528442b889df4",
           path: "api",
           tag: "v0.1.0",
         },
         admin: {
-          commit: "81ce7a066dc2a2429c2bb12ee5676632e54b7841",
+          commit: "d450735bdc89415b926e6e83b6d95b37cca02cb3",
           path: "admin",
           tag: "v0.1.0",
         },
         site: {
-          commit: "8f039a6957e7c4242794aa996e86322fc466b41c",
+          commit: "5d46f385d179da27a5f5377ccd9bcac25e91f0ae",
           path: "site",
           tag: "v0.1.0",
         },
@@ -108,9 +108,9 @@ describe("release submodule pins", () => {
 
     expect(results).toHaveLength(3);
     expect(results.map((result) => result.gitlinkCommit)).toEqual([
-      "81ce7a066dc2a2429c2bb12ee5676632e54b7841",
-      "270a564183ac3b26868717cf6d18431bbbdf5ae2",
-      "8f039a6957e7c4242794aa996e86322fc466b41c",
+      "d450735bdc89415b926e6e83b6d95b37cca02cb3",
+      "3dcc60d295875a2d101f321f30d528442b889df4",
+      "5d46f385d179da27a5f5377ccd9bcac25e91f0ae",
     ]);
     expect(results.every((result) => result.headCommit === result.gitlinkCommit)).toBe(
       true,
