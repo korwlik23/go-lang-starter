@@ -1,0 +1,65 @@
+name: Suite compatibility
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: suite-compatibility-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout pinned suite
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          submodules: recursive
+      - name: Set up pnpm
+        uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+      - name: Set up Node
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
+        with:
+          node-version: 24.8.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test:release
+      - run: pnpm exec vitest run integration/tests/infra-stack-templates.test.ts
+
+  database-stack:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [postgres, mariadb]
+    steps:
+      - name: Checkout pinned suite
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0
+        with:
+          submodules: recursive
+      - name: Render profile
+        run: docker compose --profile "${{ matrix.profile }}" -f compose.dev.yml config --quiet
+      - name: Start profile
+        run: docker compose --profile "${{ matrix.profile }}" -f compose.dev.yml up --build --wait
+      - name: Verify suite HTTP boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(curl --fail --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:8080/readyz)" = "200"
+          test "$(curl --fail --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:5173/healthz)" = "200"
+          test "$(curl --fail --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:4321/healthz)" = "200"
+          test "$(curl --fail --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:4321/th/)" = "200"
+          test "$(curl --fail --silent --output /dev/null --write-out '%{http_code}' http://127.0.0.1:4321/en/)" = "200"
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose --profile "${{ matrix.profile }}" -f compose.dev.yml logs --no-color
+      - name: Stop profile
+        if: always()
+        run: docker compose --profile "${{ matrix.profile }}" -f compose.dev.yml down
