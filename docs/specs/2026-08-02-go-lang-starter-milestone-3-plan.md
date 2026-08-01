@@ -307,7 +307,7 @@ by the contract scripts.
 - **Change:** บันทึก resource fields, status transitions, permission matrix, public 404/
   noindex rules, cache headers, idempotency และ error codesตามข้อ 5; เพิ่ม example payloads
   ที่ไม่มี secret และระบุว่า public site เป็นผู้เติม `/[locale]`
-- **Verify:** `rg -n "content_version_conflict|public_content_not_found|no-store|hreflang|publishing.pages" docs/contracts/milestone-3-*.md`
+- **Verify:** `rg -n "content_version_conflict|public_content_not_found|no-store|hreflang|publishing.pages" docs/contracts/milestone-3-publishing.md docs/contracts/milestone-3-public-rendering.md`
 - **Pass:** ไม่มี placeholder และสองเอกสารไม่ขัดกัน
 
 ### Task A1 — Publishing manifest and permission RED tests `[S][TDD]`
