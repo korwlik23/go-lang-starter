@@ -1,0 +1,196 @@
+name: go-lang-starter
+
+services:
+  postgres:
+    profiles: [postgres]
+    image: docker.io/library/postgres:18.4-alpine3.24@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: go_lang_starter_dev
+      POSTGRES_USER: go_lang_starter
+      POSTGRES_PASSWORD: development-only-database-password
+    healthcheck:
+      test: [CMD, pg_isready, --host=127.0.0.1, --username=go_lang_starter, --dbname=go_lang_starter_dev]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      database:
+        aliases: [database]
+
+  mariadb:
+    profiles: [mariadb]
+    image: docker.io/library/mariadb:11.4.12@sha256:a794d9eb009e20de605858a11f32f63b4075cbd197c650436f0e3b457e4caed7
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: go_lang_starter_dev
+      MARIADB_USER: go_lang_starter
+      MARIADB_PASSWORD: development-only-database-password
+      MARIADB_ROOT_PASSWORD: development-only-root-database-password
+    healthcheck:
+      test: [CMD, healthcheck.sh, --connect, --innodb_initialized]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    security_opt: [no-new-privileges:true]
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    networks:
+      database:
+        aliases: [database]
+
+  migrate-postgres:
+    profiles: [postgres]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: [/app/migrate]
+    env_file: [api/.env.example]
+    environment:
+      DB_DRIVER: postgres
+      DB_FLAVOR: ""
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      postgres:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+
+  migrate-mariadb:
+    profiles: [mariadb]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: [/app/migrate]
+    env_file: [api/.env.example]
+    environment:
+      DB_DRIVER: mysql
+      DB_FLAVOR: mariadb
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+
+  api-postgres:
+    profiles: [postgres]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: [api/.env.example]
+    environment:
+      HTTP_ADDRESS: 0.0.0.0:8080
+      DB_DRIVER: postgres
+      DB_FLAVOR: ""
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      migrate-postgres:
+        condition: service_completed_successfully
+    ports:
+      - 127.0.0.1:8080:8080
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks:
+      database: {}
+      edge:
+        aliases: [api]
+
+  api-mariadb:
+    profiles: [mariadb]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file: [api/.env.example]
+    environment:
+      HTTP_ADDRESS: 0.0.0.0:8080
+      DB_DRIVER: mysql
+      DB_FLAVOR: mariadb
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      migrate-mariadb:
+        condition: service_completed_successfully
+    ports:
+      - 127.0.0.1:8080:8080
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks:
+      database: {}
+      edge:
+        aliases: [api]
+
+  admin:
+    build:
+      context: admin
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      PUBLIC_API_BASE_URL: http://127.0.0.1:8080/api/v1
+    ports:
+      - 127.0.0.1:5173:8080
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+      - /var/cache/nginx:size=32m,mode=0755
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [edge]
+
+  site:
+    build:
+      context: site
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      SITE_API_BASE_URL: http://api:8080/api/v1
+      PUBLIC_SITE_URL: http://127.0.0.1:4321
+    ports:
+      - 127.0.0.1:4321:4321
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [edge]
+
+networks:
+  database:
+    internal: true
+  edge:
+
+volumes:
+  mariadb_data:
+  postgres_data:

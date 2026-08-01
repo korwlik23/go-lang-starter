@@ -58,3 +58,6 @@ git submodule update --init --recursive
 แต่ละ child repository มี version และ deployment lifecycle ของตัวเอง ส่วน release
 ของ parent จะบันทึก exact child commit, SemVer, immutable image digest, API contract
 checksum และ InfraStack revision ที่ผ่าน compatibility verification ร่วมกัน
+## Local quick start
+
+เลือก PostgreSQL หรือ MariaDB profile แล้วทำตาม [Local development](docs/operations/local-development.md) ซึ่งครอบคลุม migration order, one-time permission-driven bootstrap, XAMPP และ troubleshooting
