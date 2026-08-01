@@ -1,0 +1,32 @@
+services:
+  admin:
+    image: ${APP_IMAGE_DIGEST_REF:?set APP_IMAGE_DIGEST_REF}
+    restart: unless-stopped
+    user: "101:101"
+    environment:
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:?set PUBLIC_API_BASE_URL}
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+      - /var/cache/nginx:size=32m,mode=0755
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 256M
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.go-lang-admin.rule=Host(`${APP_DOMAIN:?set APP_DOMAIN}`)
+      - traefik.http.routers.go-lang-admin.entrypoints=websecure
+      - traefik.http.routers.go-lang-admin.tls.certresolver=letsencrypt
+      - traefik.http.routers.go-lang-admin.middlewares=security-headers@file
+      - traefik.http.services.go-lang-admin.loadbalancer.server.port=8080
+      - traefik.http.services.go-lang-admin.loadbalancer.healthcheck.path=/healthz
+      - traefik.http.services.go-lang-admin.loadbalancer.healthcheck.interval=10s
+    networks: [proxy]
+
+networks:
+  proxy:
+    external: true
