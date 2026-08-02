@@ -8,46 +8,46 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 4db2740ea16bda2c9af127db43e6afe04ad2f4eb
+    commit: 8d10e11d93ec0de9364622f1b80f6bef2f8a6592
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 4c833c6a29a83551e70f7a9745abb0bf8b7a5a66
+    commit: 8edcda0122bcfb07311173babb9048fa8900c630
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 2ccfa694bb33d3b126b1c0d93fe02a7e07100544
+    commit: 4d9de946b73b8601659087b85f6871ff4b0892da
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:
     admin:
       version: 0.1.0
-      path: integration/fixtures/contracts/admin.openapi.yaml
-      sha256: 937b78e96eabbb70e3e2bdcf4c5452f169aa7a825e666aa15a04aae434ff54da
+      path: api/openapi/dist/admin.openapi.yaml
+      sha256: ed9b014dc4f92694660763fa5cd58c3096c8194ede0cdb75a1e6e1a42d46a1e4
     public:
       version: 0.1.0
-      path: integration/fixtures/contracts/admin.openapi.yaml
-      sha256: 937b78e96eabbb70e3e2bdcf4c5452f169aa7a825e666aa15a04aae434ff54da
+      path: api/openapi/dist/public.openapi.yaml
+      sha256: b1b53a34a70153acc714798211a9d854d013d45e895b8dba3d41a93cbb526547
     siteServer:
       version: 0.1.0
-      path: integration/fixtures/contracts/admin.openapi.yaml
-      sha256: 937b78e96eabbb70e3e2bdcf4c5452f169aa7a825e666aa15a04aae434ff54da
+      path: api/openapi/dist/site-server.openapi.yaml
+      sha256: 9056e32edd5c17af49d436df7bc021a17ba49aaa2b35684d7f9a83ac875e499c
   localizationCatalog:
     version: 1.0.0
-    path: integration/fixtures/contracts/admin.openapi.yaml
-    sha256: 937b78e96eabbb70e3e2bdcf4c5452f169aa7a825e666aa15a04aae434ff54da
+    path: site/src/locales/en/common.json
+    sha256: 03b25778e2d426f7578c4db34177fac7b56f3125569a472958eb48ed48421336
 infraStack:
   repository: https://github.com/korwlik23/infra-stack.git
-  commit: dddddddddddddddddddddddddddddddddddddddd
+  commit: 09c59ded7e27da5c9feec489c28fee6cac149618
   deployScript:
-    path: integration/fixtures/contracts/admin.openapi.yaml
-    sha256: 937b78e96eabbb70e3e2bdcf4c5452f169aa7a825e666aa15a04aae434ff54da
+    path: ops/infra-stack/api/docker-compose.yml
+    sha256: 1f86662fa690beb34583ee5654dfbcb3d0491693c92ac9e4d21ef501eaf5aa39
     mode: "100755"
 databaseSupport:
   - profile: postgresql
@@ -56,7 +56,7 @@ databaseSupport:
     evidence: integration/evidence/postgresql.json
   - profile: mariadb-xampp
     version: "10.4.32"
-    status: supported
+    status: not-tested
     evidence: integration/evidence/mariadb-xampp.json
   - profile: mysql-oracle
     status: not-tested

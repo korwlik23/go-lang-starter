@@ -836,6 +836,25 @@ M3 ผ่านเมื่อมีหลักฐานทั้งหมด�
 
 ## 16. Approval gate
 
+## 17. Observed implementation evidence (2026-08-02)
+
+> The user approval gate is satisfied. The historical draft note below is
+> retained for traceability and must not be read as the current status.
+
+This plan is approved and implementation evidence is recorded here as M3 work
+advances. The verified child revisions are:
+
+- API: `8d10e11d93ec0de9364622f1b80f6bef2f8a6592`
+- Admin: `8edcda0122bcfb07311173babb9048fa8900c630`
+- Site: `4d9de946b73b8601659087b85f6871ff4b0892da`
+
+Observed checks include API publishing repository/schedule/contract tests in a
+pinned Go container, Admin and Site contract lock tests, parent CMS fixture and
+structure tests, pinned PostgreSQL migration, pinned Docker MariaDB migration
+parity, and Compose configuration rendering. Native XAMPP reset tests, Oracle
+MySQL, browser Playwright E2E, and a live author-to-public API flow remain
+explicitly unverified until those runtimes are intentionally enabled.
+
 เอกสารนี้เป็น plan เท่านั้น ยังไม่มี implementation ใน M3 จนกว่าจะได้รับ approval ชัดเจน
 หลังอนุมัติ ลำดับถัดไปคือ `test-driven-development` + `backend-architecture` สำหรับ
 Phase A และเปิด child branch แยกตาม bounded context; การ commit/push/release tag ต้องทำ

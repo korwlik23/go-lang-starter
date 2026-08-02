@@ -1,0 +1,73 @@
+schemaVersion: 1
+site:
+  id: starter-site
+  defaultLocale: th
+  enabledLocales:
+    - th
+    - en
+    - ja
+content:
+  - id: content-about
+    kind: page
+    path: /about
+    translations:
+      th:
+        status: published
+        title: เกี่ยวกับเรา
+        version: 3
+      en:
+        status: published
+        title: About us
+        version: 2
+      ja:
+        status: missing
+  - id: content-draft
+    kind: page
+    path: /internal-roadmap
+    translations:
+      th:
+        status: draft
+        title: แผนงานภายใน
+        version: 1
+      en:
+        status: missing
+      ja:
+        status: missing
+  - id: content-release-notes
+    kind: post
+    path: /blog/release-notes
+    translations:
+      th:
+        status: scheduled
+        title: บันทึกการเผยแพร่
+        version: 4
+        publishAt: 2026-08-03T09:00:00Z
+      en:
+        status: published
+        title: Release notes
+        version: 4
+      ja:
+        status: missing
+media:
+  - id: asset-brand-mark
+    visibility: private
+    mimeType: image/svg+xml
+    path: media/asset-brand-mark.svg
+    sha256: 6d9f3c7f8e9c0d9b9f6f8db0f9d405a2e49d6f9a6b1f5b2d7e2b4e7c3a1f0d8c
+redirects:
+  - id: redirect-old-about
+    locale: th
+    source: /company
+    destination: /about
+    statusCode: 308
+    enabled: true
+flow:
+  authorReviewPublish:
+    - draft
+    - review
+    - published
+  preview:
+    exchange: one-time
+    replay: rejected
+  cache:
+    invalidation: content-version

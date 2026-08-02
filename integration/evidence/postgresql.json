@@ -1,0 +1,22 @@
+{
+  "profile": "postgresql",
+  "status": "supported",
+  "observedAt": "2026-08-02",
+  "runtime": "docker.io/library/postgres:18.4-alpine3.24",
+  "commands": [
+    "docker compose --project-name m3verify --profile postgres -f compose.dev.yml config --quiet",
+    "docker compose --project-name m3verify --profile postgres -f compose.dev.yml up --build --abort-on-container-exit --exit-code-from migrate-postgres migrate-postgres"
+  ],
+  "observations": [
+    {
+      "check": "compose configuration",
+      "exitCode": 0
+    },
+    {
+      "check": "clean PostgreSQL database migration",
+      "exitCode": 0,
+      "result": "migration completed and seeded configured locales"
+    }
+  ],
+  "scope": "Migration/build evidence only; full HTTP CMS flow is recorded separately."
+}

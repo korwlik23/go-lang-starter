@@ -11,8 +11,10 @@
   },
   "scripts": {
     "test:release": "vitest run integration/tests/release",
+    "test:integration": "vitest run integration/tests",
     "release:verify": "node scripts/release/verify-release.mjs",
-    "release:verify:all": "node scripts/release/verify-all.mjs"
+    "release:verify:all": "node scripts/release/verify-all.mjs",
+    "verify:structure": "node scripts/verify-structure.mjs"
   },
   "devDependencies": {
     "@types/node": "24.13.3",
