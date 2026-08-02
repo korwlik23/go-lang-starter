@@ -32,6 +32,11 @@
       "check": "session SQL mode compatibility",
       "exitCode": 0,
       "result": "Go MySQL-family connections request STRICT_TRANS_TABLES plus the safe date/engine modes, independent of XAMPP global sql_mode"
+    },
+    {
+      "check": "XAMPP privilege metadata precondition",
+      "exitCode": 0,
+      "result": "mysql.global_priv and mysql.db were repaired after CHECK TABLE reported corruption; unrelated corrupt privilege tables were not modified and existing database-level grants should be reviewed"
     }
   ],
   "scope": "Native XAMPP MariaDB 10.4.32 passed against the dedicated go_lang_starter_test_m3 database and go_lang_starter_test principal only; no user or production databases were touched. Oracle MySQL remains untested."
