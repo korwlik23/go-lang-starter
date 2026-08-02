@@ -93,12 +93,12 @@ describe("release submodule pins", () => {
           tag: "v0.1.0",
         },
         admin: {
-          commit: "66b6fdc7bb5f1e9f59ac8ffb16dca4ae324b0c0e",
+          commit: "87b9df7b48ef91da93a93199c12cf891db0bfb06",
           path: "admin",
           tag: "v0.1.0",
         },
         site: {
-          commit: "838399cf73109129cbd9d8361e8bbbb22d342463",
+          commit: "6fa157e34c7ecd171d3694cfe19aebf9d8c34eba",
           path: "site",
           tag: "v0.1.0",
         },
@@ -108,9 +108,9 @@ describe("release submodule pins", () => {
 
     expect(results).toHaveLength(3);
     expect(results.map((result) => result.gitlinkCommit)).toEqual([
-      "66b6fdc7bb5f1e9f59ac8ffb16dca4ae324b0c0e",
+      "87b9df7b48ef91da93a93199c12cf891db0bfb06",
       "80862457dd584a7d07a7299f4406c9b9773d7127",
-      "838399cf73109129cbd9d8361e8bbbb22d342463",
+      "6fa157e34c7ecd171d3694cfe19aebf9d8c34eba",
     ]);
     expect(results.every((result) => result.headCommit === result.gitlinkCommit)).toBe(
       true,
