@@ -88,11 +88,18 @@ docker compose --profile mariadb -f compose.dev.yml down
 
 ใช้ `api/.env.mariadb-xampp.example` เป็นฐาน ตั้ง `DB_HOST=host.docker.internal` เมื่อ API รันใน container หรือ `DB_HOST=127.0.0.1` เมื่อ API รันบน Windows โดยตรง ต้องใช้ database และ principal สำหรับ development/test โดยเฉพาะ ห้ามชี้ migration/test runner ไปยัง production database
 
-ตรวจ profile จาก API repository:
+ตรวจ profile จาก API repository (ใช้ dedicated database เท่านั้น):
 
 ```powershell
 Set-Location D:\go-lang-starter\api
-.\scripts\test-db.ps1 -Profile xampp -EnvFile .env.mariadb-xampp
+$env:XAMPP_TEST_PASSWORD = '<read from a local secret store>'
+.\scripts\test-db.ps1 `
+  -Profile mariadb-xampp `
+  -XamppDatabase go_lang_starter_test_m3 `
+  -XamppUser go_lang_starter_test `
+  -XamppPasswordEnv XAMPP_TEST_PASSWORD `
+  -AllowTestDatabaseReset `
+  -Package ./tests/migrations
 ```
 
 Runner มี destructive guard และจะปฏิเสธชื่อ database ที่ไม่ใช่ test profile ตาม contract

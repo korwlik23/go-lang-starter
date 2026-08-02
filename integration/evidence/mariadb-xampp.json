@@ -1,26 +1,38 @@
 {
   "profile": "mariadb-xampp",
-  "status": "not-tested",
+  "status": "pass",
   "observedAt": "2026-08-02",
-  "runtime": "docker.io/library/mariadb:11.4.12",
+  "runtime": "C:\\xampp\\mysql\\bin\\mysqld.exe (10.4.32-MariaDB)",
   "commands": [
+    "C:\\xampp\\mysql\\bin\\mysqladmin.exe --protocol=tcp --host=127.0.0.1 --port=3306 --user=root ping",
     "docker compose --project-name m3verify --profile mariadb -f compose.dev.yml config --quiet",
-    "docker compose --project-name m3verify --profile mariadb -f compose.dev.yml up --build --abort-on-container-exit --exit-code-from migrate-mariadb migrate-mariadb"
+    "docker compose --project-name m3verify --profile mariadb -f compose.dev.yml up --build --abort-on-container-exit --exit-code-from migrate-mariadb migrate-mariadb",
+    ".\\scripts\\test-db.ps1 -Profile mariadb-xampp -XamppDatabase go_lang_starter_test_m3 -XamppUser go_lang_starter_test -XamppPasswordEnv XAMPP_TEST_PASSWORD -AllowTestDatabaseReset -Package ./tests/migrations",
+    ".\\scripts\\test-db.ps1 -Profile mariadb-xampp -XamppDatabase go_lang_starter_test_m3 -XamppUser go_lang_starter_test -XamppPasswordEnv XAMPP_TEST_PASSWORD -AllowTestDatabaseReset -Package ./internal/app -Run TestBootstrapIntegrationIsAtomicAndIdempotent",
+    ".\\scripts\\test-db.ps1 -Profile mariadb-xampp -XamppDatabase go_lang_starter_test_m3 -XamppUser go_lang_starter_test -XamppPasswordEnv XAMPP_TEST_PASSWORD -AllowTestDatabaseReset -Package ./internal/modules/operations/adapters/gorm -Run TestModuleStateRepositoryReconcilesAtomically",
+    ".\\scripts\\test-db.ps1 -Profile mariadb-xampp -XamppDatabase go_lang_starter_test_m3 -XamppUser go_lang_starter_test -XamppPasswordEnv XAMPP_TEST_PASSWORD -AllowTestDatabaseReset -Package ./internal/modules/audit/adapters/gorm -Run TestEventRepositoryAppendsAndPagesSystemEvents",
+    ".\\scripts\\test-db.ps1 -Profile mariadb-xampp -XamppDatabase go_lang_starter_test_m3 -XamppUser go_lang_starter_test -XamppPasswordEnv XAMPP_TEST_PASSWORD -AllowTestDatabaseReset -Package ./internal/platform/database -Run TestD2DatabaseIntegration"
   ],
   "observations": [
     {
-      "check": "compose configuration",
+      "check": "native XAMPP MariaDB connectivity",
       "exitCode": 0
     },
     {
       "check": "clean Docker MariaDB migration parity",
       "exitCode": 0,
-      "result": "migration completed"
+      "result": "migration completed on docker.io/library/mariadb:11.4.12"
     },
     {
-      "check": "native XAMPP MariaDB dedicated test database",
-      "result": "not tested; no database reset was requested"
+      "check": "native XAMPP migration and repository package suite",
+      "exitCode": 0,
+      "result": "migration, bootstrap, operations projection, audit repository, and database integration checks passed; packages were run serially with a reset dedicated database between stateful packages"
+    },
+    {
+      "check": "session SQL mode compatibility",
+      "exitCode": 0,
+      "result": "Go MySQL-family connections request STRICT_TRANS_TABLES plus the safe date/engine modes, independent of XAMPP global sql_mode"
     }
   ],
-  "scope": "Docker MariaDB parity passed; this evidence deliberately does not claim native XAMPP or Oracle MySQL support."
+  "scope": "Native XAMPP MariaDB 10.4.32 passed against the dedicated go_lang_starter_test_m3 database and go_lang_starter_test principal only; no user or production databases were touched. Oracle MySQL remains untested."
 }

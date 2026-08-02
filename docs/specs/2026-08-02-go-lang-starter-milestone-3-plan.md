@@ -844,19 +844,19 @@ M3 ผ่านเมื่อมีหลักฐานทั้งหมด�
 This plan is approved and implementation evidence is recorded here as M3 work
 advances. The verified child revisions are:
 
-Latest observed evidence (2026-08-02): API commit `36d2d4396f73d66f6a6d971f93c486eb79fbab1b` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. `D:\infra-stack` and user databases were not touched. Native XAMPP reset tests, Oracle MySQL, browser Playwright E2E, and GitHub push remain unverified.
+Latest observed evidence (2026-08-02): API commit `6e021b4cd654739dbbeb039bda7ee616b9f5401a` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` also passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; `D:\infra-stack` and user databases were not touched. Oracle MySQL, browser Playwright E2E, and GitHub push remain unverified.
 
-- API: `36d2d4396f73d66f6a6d971f93c486eb79fbab1b`
+- API: `6e021b4cd654739dbbeb039bda7ee616b9f5401a`
 - Admin: `2cdb5a579b1e293d433ae35283c2abbc75d558e2`
 - Site: `45bd3a1b2a07173030de4ae335e840147d5b46b3`
 
 Observed checks include API publishing repository/schedule/contract tests in a
 pinned Go container, Admin and Site contract lock tests, parent CMS fixture and
 structure tests, pinned PostgreSQL migration, pinned Docker MariaDB migration
-parity, and Compose configuration rendering. Native XAMPP reset tests, Oracle
-MySQL, and browser Playwright E2E remain explicitly unverified until those
-runtimes are intentionally enabled; the live author-to-public API flow is
-verified above.
+parity, native XAMPP MariaDB integration packages, and Compose configuration
+rendering. Oracle MySQL and browser Playwright E2E remain explicitly unverified
+until those runtimes are intentionally enabled; the live author-to-public API
+flow is verified above.
 
 เอกสารนี้เป็น plan เท่านั้น ยังไม่มี implementation ใน M3 จนกว่าจะได้รับ approval ชัดเจน
 หลังอนุมัติ ลำดับถัดไปคือ `test-driven-development` + `backend-architecture` สำหรับ
