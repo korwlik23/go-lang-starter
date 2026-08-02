@@ -15,14 +15,14 @@ components:
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 8edcda0122bcfb07311173babb9048fa8900c630
+    commit: 2cdb5a579b1e293d433ae35283c2abbc75d558e2
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 4d9de946b73b8601659087b85f6871ff4b0892da
+    commit: 45bd3a1b2a07173030de4ae335e840147d5b46b3
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:
