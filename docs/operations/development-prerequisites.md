@@ -101,7 +101,7 @@ deprecate ตั้งแต่รุ่นก่อนหน้า จึงต
 |---|---|---|
 | `postgresql` | `postgres:18.4-alpine3.24`; `postgres@sha256:9a8afca54e7861fd90fab5fdf4c42477a6b1cb7d293595148e674e0a3181de15`; runtime รายงาน PostgreSQL `18.4` | PASS |
 | `mariadb-xampp` | `C:\xampp\mysql\bin\mysql.exe`, `10.4.32-MariaDB` | PASS; dedicated XAMPP migration/repository suite ผ่าน |
-| `mysql-oracle` | ไม่มี Oracle MySQL runtime ที่ตรวจได้ | NOT TESTED; ห้ามประกาศ supported |
+| `mysql-oracle` | Docker `mysql:8.4` (`8.4.11`, pinned digest) | PASS; disposable migration/repository suite ผ่าน |
 
 XAMPP profile นี้คือ `MariaDB/XAMPP` ไม่ใช่ Oracle MySQL การทดสอบ migration ต้องใช้
 dedicated test database เท่านั้น ห้ามชี้ไปฐานข้อมูลใช้งานจริง

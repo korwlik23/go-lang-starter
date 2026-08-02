@@ -1,6 +1,6 @@
 {
   "profile": "mariadb-xampp",
-  "status": "pass",
+  "status": "supported",
   "observedAt": "2026-08-02",
   "runtime": "C:\\xampp\\mysql\\bin\\mysqld.exe (10.4.32-MariaDB)",
   "commands": [
@@ -39,5 +39,5 @@
       "result": "mysql.global_priv and mysql.db were repaired after CHECK TABLE reported corruption; unrelated corrupt privilege tables were not modified and existing database-level grants should be reviewed"
     }
   ],
-  "scope": "Native XAMPP MariaDB 10.4.32 passed against the dedicated go_lang_starter_test_m3 database and go_lang_starter_test principal only; no user or production databases were touched. Oracle MySQL remains untested."
+  "scope": "Native XAMPP MariaDB 10.4.32 passed against the dedicated go_lang_starter_test_m3 database and go_lang_starter_test principal only; no user or production databases were touched. Oracle MySQL evidence is recorded separately."
 }

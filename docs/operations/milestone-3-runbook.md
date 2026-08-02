@@ -48,8 +48,9 @@ docker compose --profile mariadb -f compose.dev.yml up --build -d
 
 Native XAMPP testing requires a dedicated `go_lang_starter_test_*` database and
 the guarded runner documented in
-`docs/operations/database-compatibility.md`. Oracle MySQL remains `NOT TESTED`
-until an actual service is available.
+`docs/operations/database-compatibility.md`. Oracle MySQL compatibility is
+verified separately with the disposable profile recorded in
+`integration/evidence/mysql-oracle.json`.
 
 ## Preview and cache checks
 

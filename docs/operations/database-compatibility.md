@@ -8,7 +8,7 @@ recorded result.
 | --- | --- | --- |
 | PostgreSQL 18.4 | PASS — clean migration/build on the pinned Compose image | `integration/evidence/postgresql.json` |
 | MariaDB/XAMPP | PASS — native XAMPP MariaDB 10.4.32 dedicated integration suite and Docker MariaDB parity | `integration/evidence/mariadb-xampp.json` |
-| Oracle MySQL | NOT TESTED | No evidence file is created until an Oracle MySQL service is available |
+| Oracle MySQL 8.4.11 | PASS — disposable MySQL Community Server migration and repository integration suite | `integration/evidence/mysql-oracle.json` |
 
 The application keeps the MySQL-family dialect boundary (`DB_DRIVER=mysql`,
 `DB_FLAVOR=mariadb`) separate from PostgreSQL. Native XAMPP verification must

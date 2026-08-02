@@ -8,21 +8,21 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 6e021b4cd654739dbbeb039bda7ee616b9f5401a
+    commit: 80862457dd584a7d07a7299f4406c9b9773d7127
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 8aaf9825ade537ac92d1dc74b5eb2e39e60b9ca6
+    commit: 66b6fdc7bb5f1e9f59ac8ffb16dca4ae324b0c0e
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 2bccacbc9b85cac12728d51213ce3327aa0cbc7d
+    commit: 838399cf73109129cbd9d8361e8bbbb22d342463
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:
@@ -59,4 +59,6 @@ databaseSupport:
     status: supported
     evidence: integration/evidence/mariadb-xampp.json
   - profile: mysql-oracle
-    status: not-tested
+    version: "8.4.11"
+    status: supported
+    evidence: integration/evidence/mysql-oracle.json

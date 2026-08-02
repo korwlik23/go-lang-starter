@@ -1,0 +1,29 @@
+{
+  "profile": "mysql-oracle",
+  "status": "supported",
+  "observedAt": "2026-08-03",
+  "runtime": "docker.io/library/mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb (8.4.11)",
+  "commands": [
+    "docker run --detach --name <disposable-container> --publish 13306:3306 --env-file <local-secret-env> docker.io/library/mysql:8.4@sha256:b3b90af2a6552ae30c266fdb7d5dd55f3afb72404bb78d37fe8a23eb857fd3fb",
+    "docker exec <disposable-container> mysql -uroot -p<redacted> -N -B -e \"SELECT VERSION(), @@version_comment, @@sql_mode;\"",
+    "go run ./tests/testsupport/cmd/database-guard",
+    "go test -p 1 ./tests/migrations -count=1",
+    "go test -p 1 ./internal/app -run ^TestBootstrapIntegrationIsAtomicAndIdempotent$ -count=1",
+    "go test -p 1 ./internal/modules/operations/adapters/gorm -run ^TestModuleStateRepositoryReconcilesAtomically$ -count=1",
+    "go test -p 1 ./internal/modules/audit/adapters/gorm -run ^TestEventRepositoryAppendsAndPagesSystemEvents$ -count=1",
+    "go test -p 1 ./internal/platform/database -run ^TestD2DatabaseIntegration$ -count=1"
+  ],
+  "observations": [
+    {
+      "check": "Oracle MySQL runtime health and identity",
+      "exitCode": 0,
+      "result": "MySQL Community Server 8.4.11; strict SQL mode enabled"
+    },
+    {
+      "check": "clean migration and repository integration package suite",
+      "exitCode": 0,
+      "result": "migration, bootstrap, operations projection, audit repository, and database integration checks passed when run serially against the disposable test database"
+    }
+  ],
+  "scope": "Disposable Oracle MySQL container and go_lang_starter_test_mysql_oracle database only; container and test data were removed after validation. No user or production database was touched."
+}

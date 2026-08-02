@@ -40,8 +40,8 @@ git submodule update --init --recursive
 
 - `postgresql` — primary profile
 - `mariadb-xampp` — first-class local profile สำหรับ MariaDB ที่มากับ XAMPP
-- `mysql-oracle` — compatibility profile; ยังห้ามประกาศ supported
-  จนกว่าจะผ่าน integration tests บน Oracle MySQL จริง
+- `mysql-oracle` — compatibility profile ที่ผ่าน integration tests บน
+  Oracle MySQL 8.4.11 แบบ disposable แล้ว
 
 รายละเอียด runtime และเครื่องมือที่ตรวจแล้วอยู่ใน
 [Development Prerequisites](docs/operations/development-prerequisites.md)
