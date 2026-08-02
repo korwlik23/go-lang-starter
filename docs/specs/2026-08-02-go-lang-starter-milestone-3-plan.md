@@ -836,7 +836,7 @@ M3 ผ่านเมื่อมีหลักฐานทั้งหมด�
 
 ## 16. Approval gate
 
-## 17. Observed implementation evidence (2026-08-02)
+## 17. Observed implementation evidence (2026-08-03)
 
 > The user approval gate is satisfied. The historical draft note below is
 > retained for traceability and must not be read as the current status.
@@ -858,7 +858,7 @@ rendering. Browser smoke E2E for Admin and Site passed against disposable local
 web servers; the live `D:\infra-stack` deployment remains unverified and the
 author-to-public API flow is verified above.
 
-เอกสารนี้เป็น plan เท่านั้น ยังไม่มี implementation ใน M3 จนกว่าจะได้รับ approval ชัดเจน
-หลังอนุมัติ ลำดับถัดไปคือ `test-driven-development` + `backend-architecture` สำหรับ
-Phase A และเปิด child branch แยกตาม bounded context; การ commit/push/release tag ต้องทำ
-ตาม approval ของแต่ละ release boundary
+หลักฐานด้านบนบันทึก implementation ของ M3 ที่ทำและตรวจแล้วตาม release boundary
+ปัจจุบันยังเหลือเฉพาะงานที่ต้องพึ่ง environment ภายนอก เช่น deploy จริงบน
+`D:\infra-stack`, immutable GHCR image digests และ hosted CI/PR; งานเหล่านี้ต้องใช้
+ค่า production และ approval แยกก่อนดำเนินการ
