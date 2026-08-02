@@ -844,7 +844,7 @@ M3 ผ่านเมื่อมีหลักฐานทั้งหมด�
 This plan is approved and implementation evidence is recorded here as M3 work
 advances. The verified child revisions are:
 
-Latest observed evidence (2026-08-03): API commit `80862457dd584a7d07a7299f4406c9b9773d7127` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; disposable Oracle MySQL `8.4.11` passed the same compatibility package suite. The four repositories were pushed without force; `D:\infra-stack` and user databases were not touched. Browser Playwright E2E remains unverified.
+Latest observed evidence (2026-08-03): API commit `80862457dd584a7d07a7299f4406c9b9773d7127` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; disposable Oracle MySQL `8.4.11` passed the same compatibility package suite. The four repositories were pushed without force; Admin browser smoke (2 tests) and Site browser smoke (4 tests) passed against disposable local web servers. `D:\infra-stack` and user databases were not touched.
 
 - API: `80862457dd584a7d07a7299f4406c9b9773d7127`
 - Admin: `87b9df7b48ef91da93a93199c12cf891db0bfb06`
@@ -854,9 +854,9 @@ Observed checks include API publishing repository/schedule/contract tests in a
 pinned Go container, Admin and Site contract lock tests, parent CMS fixture and
 structure tests, pinned PostgreSQL migration, pinned Docker MariaDB migration
 parity, native XAMPP MariaDB integration packages, and Compose configuration
-rendering. Browser Playwright E2E remains explicitly unverified until the
-browser runtime is intentionally enabled; the live author-to-public API flow
-is verified above.
+rendering. Browser smoke E2E for Admin and Site passed against disposable local
+web servers; the live `D:\infra-stack` deployment remains unverified and the
+author-to-public API flow is verified above.
 
 เอกสารนี้เป็น plan เท่านั้น ยังไม่มี implementation ใน M3 จนกว่าจะได้รับ approval ชัดเจน
 หลังอนุมัติ ลำดับถัดไปคือ `test-driven-development` + `backend-architecture` สำหรับ

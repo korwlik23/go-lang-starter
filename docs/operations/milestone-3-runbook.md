@@ -27,12 +27,14 @@ pnpm test:run --maxWorkers=1
 pnpm typecheck
 pnpm lint
 pnpm build
+pnpm test:e2e
 
 Set-Location D:\go-lang-starter\site
 pnpm test:run --maxWorkers=1
 pnpm check
 pnpm lint
 pnpm build
+pnpm test:e2e
 ```
 
 ## Database profiles
