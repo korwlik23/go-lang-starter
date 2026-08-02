@@ -99,6 +99,7 @@ services:
     env_file: [api/.env.example]
     environment:
       HTTP_ADDRESS: 0.0.0.0:8080
+      MEDIA_STORAGE_ROOT: /tmp/media
       DB_DRIVER: postgres
       DB_FLAVOR: ""
       DB_HOST: database
@@ -130,6 +131,7 @@ services:
     env_file: [api/.env.example]
     environment:
       HTTP_ADDRESS: 0.0.0.0:8080
+      MEDIA_STORAGE_ROOT: /tmp/media
       DB_DRIVER: mysql
       DB_FLAVOR: mariadb
       DB_HOST: database

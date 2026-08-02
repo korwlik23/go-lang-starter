@@ -8,21 +8,21 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 80862457dd584a7d07a7299f4406c9b9773d7127
+    commit: 1a5ac0a1563b1a7bdc110e1c2f625e5efb595664
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 87b9df7b48ef91da93a93199c12cf891db0bfb06
+    commit: f2d4a27df74223b5aa3415489695568a62a0ae4a
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 6fa157e34c7ecd171d3694cfe19aebf9d8c34eba
+    commit: f565e8313759288b72a6fd5dff1b0b846c6b8747
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:

@@ -844,11 +844,11 @@ M3 ผ่านเมื่อมีหลักฐานทั้งหมด�
 This plan is approved and implementation evidence is recorded here as M3 work
 advances. The verified child revisions are:
 
-Latest observed evidence (2026-08-03): API commit `80862457dd584a7d07a7299f4406c9b9773d7127` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; disposable Oracle MySQL `8.4.11` passed the same compatibility package suite. The four repositories were pushed without force; Admin browser smoke (2 tests) and Site browser smoke (4 tests) passed against disposable local web servers. `D:\infra-stack` and user databases were not touched.
+Latest observed evidence (2026-08-03): API commit `1a5ac0a1563b1a7bdc110e1c2f625e5efb595664` contains the verified API flow and the local-origin fix; the flow was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; disposable Oracle MySQL `8.4.11` passed the same compatibility package suite. The four repositories were pushed without force; Admin browser smoke (2 tests) and Site browser smoke (4 tests) passed against disposable local web servers. `D:\infra-stack` and user databases were not touched.
 
-- API: `80862457dd584a7d07a7299f4406c9b9773d7127`
-- Admin: `87b9df7b48ef91da93a93199c12cf891db0bfb06`
-- Site: `6fa157e34c7ecd171d3694cfe19aebf9d8c34eba`
+- API: `1a5ac0a1563b1a7bdc110e1c2f625e5efb595664`
+- Admin: `f2d4a27df74223b5aa3415489695568a62a0ae4a`
+- Site: `f565e8313759288b72a6fd5dff1b0b846c6b8747`
 
 Observed checks include API publishing repository/schedule/contract tests in a
 pinned Go container, Admin and Site contract lock tests, parent CMS fixture and
