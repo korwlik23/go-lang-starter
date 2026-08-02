@@ -847,8 +847,8 @@ advances. The verified child revisions are:
 Latest observed evidence (2026-08-02): API commit `6e021b4cd654739dbbeb039bda7ee616b9f5401a` was exercised on disposable PostgreSQL (`postgres:18.4-alpine3.24`): `GET /readyz 200`, authenticated `POST page 201` → `submit_review 200` → `publish 200`, and unauthenticated `GET /api/v1/public/content/th/live-release-final-3 200` with published GEO/AEO content. Native XAMPP MariaDB `10.4.32` also passed the dedicated migration, bootstrap, operations, audit, and database integration packages against `go_lang_starter_test_m3`; `D:\infra-stack` and user databases were not touched. Oracle MySQL, browser Playwright E2E, and GitHub push remain unverified.
 
 - API: `6e021b4cd654739dbbeb039bda7ee616b9f5401a`
-- Admin: `2cdb5a579b1e293d433ae35283c2abbc75d558e2`
-- Site: `45bd3a1b2a07173030de4ae335e840147d5b46b3`
+- Admin: `8aaf9825ade537ac92d1dc74b5eb2e39e60b9ca6`
+- Site: `2bccacbc9b85cac12728d51213ce3327aa0cbc7d`
 
 Observed checks include API publishing repository/schedule/contract tests in a
 pinned Go container, Admin and Site contract lock tests, parent CMS fixture and
