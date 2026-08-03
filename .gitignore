@@ -35,3 +35,6 @@ Desktop.ini
 tmp/
 temp/
 *.tmp
+
+# Local database backups may contain application data and credentials.
+backups/

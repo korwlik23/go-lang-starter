@@ -8,14 +8,14 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 1a5ac0a1563b1a7bdc110e1c2f625e5efb595664
+    commit: 948cfaa7c99c22063afd024090e8573e8c1ca151
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: f2d4a27df74223b5aa3415489695568a62a0ae4a
+    commit: dfc8abc60dbe0a7c0bdb682c3a4e078a5241fab8
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
@@ -29,7 +29,7 @@ contracts:
     admin:
       version: 0.1.0
       path: api/openapi/dist/admin.openapi.yaml
-      sha256: ed9b014dc4f92694660763fa5cd58c3096c8194ede0cdb75a1e6e1a42d46a1e4
+      sha256: fa39706d490dd9f822612aff8ced32badd31cf66541b535be0a393be5de41b76
     public:
       version: 0.1.0
       path: api/openapi/dist/public.openapi.yaml

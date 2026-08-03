@@ -39,6 +39,14 @@ pnpm test:e2e
 
 ## Database profiles
 
+For a repeatable local start with bootstrap and endpoint checks, use
+`docs/operations/local-setup.md` and the root scripts:
+
+```powershell
+.\scripts\dev\setup-local.ps1 -Profile mariadb
+.\scripts\dev\check-local.ps1 -Profile mariadb
+```
+
 PostgreSQL is the primary local profile. MariaDB is the MySQL-family parity
 profile used by the XAMPP configuration. Start only one profile at a time when
 using the default API port:
