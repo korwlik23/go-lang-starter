@@ -8,6 +8,10 @@ on:
       - "integration/**"
       - "releases/**"
       - "scripts/release/**"
+      - "scripts/deploy/**"
+      - "scripts/deploy-infra-stack.sh"
+      - "docs/contracts/**"
+      - "docs/operations/infra-stack.md"
       - "package.json"
       - "pnpm-lock.yaml"
       - "vitest.config.ts"
@@ -20,6 +24,10 @@ on:
       - "integration/**"
       - "releases/**"
       - "scripts/release/**"
+      - "scripts/deploy/**"
+      - "scripts/deploy-infra-stack.sh"
+      - "docs/contracts/**"
+      - "docs/operations/infra-stack.md"
       - "package.json"
       - "pnpm-lock.yaml"
       - "vitest.config.ts"
@@ -66,6 +74,17 @@ jobs:
 
       - name: Run release verifier tests
         run: pnpm test:release
+
+      - name: Run deploy contract tests
+        run: pnpm test:deploy-contract
+
+      - name: Check deploy wrapper
+        run: |
+          bash -n scripts/deploy-infra-stack.sh
+          shellcheck --severity=warning scripts/deploy-infra-stack.sh
+
+      - name: Verify starter structure
+        run: pnpm verify:structure
 
       - name: Verify the integration fixture
         run: pnpm release:verify -- integration/fixtures/releases/valid.yaml

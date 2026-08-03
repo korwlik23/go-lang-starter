@@ -82,6 +82,36 @@ system operator ที่มี permission จัดการ locale สาม�
 
 ## Deployment order
 
+## Contract-first suite deployment
+
+When a release manifest is approved, use the starter wrapper to enforce the full-suite
+deployment contract without changing the InfraStack checkout:
+
+```bash
+./scripts/deploy-infra-stack.sh \
+  --infra-stack-dir /absolute/path/to/infra-stack \
+  --release-manifest ./releases/suite-v0.1.0.yaml \
+  --api-project go-api \
+  --admin-project vue-admin \
+  --site-project astro-site
+```
+
+The wrapper stops on the first failure and performs these gates in order:
+
+1. Validate the release manifest, pinned InfraStack `HEAD`, clean worktree/index, and executable deploy script.
+2. Validate API/Admin/Site `.env` and Compose contracts: immutable OCI digests, credential-free HTTPS health URL, numeric user, read-only filesystem, `tmpfs`, `cap_drop: ALL`, `no-new-privileges`, and resource limits.
+3. Resolve release tags against the registry, pull exact digests, and verify local `RepoDigests`.
+4. Hash each target `.env` and `docker-compose.yml` before workload changes.
+5. Run API `api-migrate` with the migration principal before deploying API.
+6. Deploy and verify `/readyz` or `/healthz` plus running image ID after each service handoff.
+7. Hash target files again and fail if any target file is missing, added, or changed.
+
+The wrapper never checks out, pulls, commits, pushes, or writes files in InfraStack and does
+not print secrets. Rollback remains an explicit operator action after reviewing migration,
+health, image, and hash evidence.
+
+### Existing deployment order reference
+
 1. ตรวจว่า InfraStack checkout อยู่ revision ที่ release manifest pin และ worktree clean
 2. ตรวจ digest parity ของ API/Admin/Site
 3. รัน `api-migrate` ด้วย migration principal

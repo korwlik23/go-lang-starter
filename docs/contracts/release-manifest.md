@@ -57,6 +57,31 @@ pnpm release:verify:all -- releases/suite-v1.0.0.yaml releases/suite-v1.1.0.yaml
 CLI ไม่ค้นหรือเลือก manifest แทนผู้ใช้ เพื่อไม่ให้ release set เปลี่ยนเงียบ ๆ
 ทุก failure คืน non-zero exit code และ stable error code โดยไม่พิมพ์ secret
 
+## Deploy wrapper contract
+
+`infraStack.deployScript` is a relative path to the InfraStack deploy script (normally
+`scripts/deploy.sh`), not an application Compose file. The wrapper verifies the checkout
+`HEAD`, clean worktree/index, Git mode `100755`, and SHA-256 before executing the pinned file.
+
+Each target project must provide `.env` and `docker-compose.yml`. Runtime images must use
+`APP_IMAGE_DIGEST_REF=registry/repository@sha256:<64 hex>`. API also requires
+`MIGRATE_IMAGE` with the same digest and `DEPLOY_MIGRATE=0`; the wrapper runs `api-migrate`
+separately before the service handoff.
+
+The suite command is `scripts/deploy-infra-stack.sh` and accepts only:
+
+```text
+--infra-stack-dir <absolute checkout>
+--release-manifest <path under releases/>
+--api-project <safe compose project name>
+--admin-project <safe compose project name>
+--site-project <safe compose project name>
+```
+
+It fails closed when the manifest, target contract, registry digest, migration, health
+endpoint, running image ID, or target-file hash is invalid. It does not edit files in the
+checkout.
+
 ## Versioning
 
 API, Admin และ Site ใช้ SemVer อิสระ ส่วน parent ใช้ suite SemVer เพื่อระบุชุดที่

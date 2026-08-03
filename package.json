@@ -11,6 +11,7 @@
   },
   "scripts": {
     "test:release": "vitest run integration/tests/release",
+    "test:deploy-contract": "vitest run integration/tests/deploy-contract.test.ts",
     "test:integration": "vitest run integration/tests",
     "release:verify": "node scripts/release/verify-release.mjs",
     "release:verify:all": "node scripts/release/verify-all.mjs",
