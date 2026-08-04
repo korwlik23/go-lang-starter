@@ -8,28 +8,28 @@ components:
     repository: https://github.com/korwlik23/go-api-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: 259efb2173e9d4dbead3110eb7e2dfb7cad9cd9a
+    commit: c59cea3f49438a16e906b1de8d755bd502e4ffea
     image: ghcr.io/korwlik23/go-api-starter@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
   admin:
     path: admin
     repository: https://github.com/korwlik23/vue-vite-admin-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: b03368626226a43dedcf8fa67f29e6bba75efdfa
+    commit: 0de6768b4c0a03b0794567a924981bb56d7f493f
     image: ghcr.io/korwlik23/vue-vite-admin-starter@sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
   site:
     path: site
     repository: https://github.com/korwlik23/astro-site-starter.git
     version: 0.1.0
     tag: v0.1.0
-    commit: d6a71ce9740aa3ab139e6b62939155de0699c0ec
+    commit: 1e575d5ffc745d3eec7ed59305379fd1f11de9f0
     image: ghcr.io/korwlik23/astro-site-starter@sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 contracts:
   openapi:
     admin:
       version: 0.1.0
       path: api/openapi/dist/admin.openapi.yaml
-      sha256: fa39706d490dd9f822612aff8ced32badd31cf66541b535be0a393be5de41b76
+      sha256: eb063b143abfe284412a4590431b443b17bb5447b782fe5a083244baf421731f
     public:
       version: 0.1.0
       path: api/openapi/dist/public.openapi.yaml
