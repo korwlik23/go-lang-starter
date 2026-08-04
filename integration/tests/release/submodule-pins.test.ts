@@ -109,7 +109,7 @@ describe("release submodule pins", () => {
     expect(results).toHaveLength(3);
     expect(results.map((result) => result.gitlinkCommit)).toEqual([
       "0de6768b4c0a03b0794567a924981bb56d7f493f",
-      "919fd313fa04c861cdcce5309b3c25a526390c40",
+      "c59cea3f49438a16e906b1de8d755bd502e4ffea",
       "1e575d5ffc745d3eec7ed59305379fd1f11de9f0",
     ]);
     expect(results.every((result) => result.headCommit === result.gitlinkCommit)).toBe(
