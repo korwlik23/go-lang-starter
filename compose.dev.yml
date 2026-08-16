@@ -66,6 +66,36 @@ services:
     security_opt: [no-new-privileges:true]
     networks: [database]
 
+  seed-postgres:
+    profiles: [postgres]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: [/app/seed]
+    env_file: [api/.env.example]
+    environment:
+      APP_ENV: development
+      SEED_PROFILE: ${SEED_PROFILE:-full-local}
+      SEED_ACCOUNT_ID: ${SEED_ACCOUNT_ID:-9987d065-2c1d-5791-b1fe-8ca97ba35895}
+      BOOTSTRAP_EMAIL: ${BOOTSTRAP_EMAIL:-owner@example.com}
+      BOOTSTRAP_PASSWORD: ${BOOTSTRAP_PASSWORD:-}
+      BOOTSTRAP_ACCOUNT_SLUG: ${BOOTSTRAP_ACCOUNT_SLUG:-personal}
+      DB_DRIVER: postgres
+      DB_FLAVOR: ""
+      DB_HOST: database
+      DB_PORT: "5432"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      migrate-postgres:
+        condition: service_completed_successfully
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+
   migrate-mariadb:
     profiles: [mariadb]
     build:
@@ -90,6 +120,36 @@ services:
     security_opt: [no-new-privileges:true]
     networks: [database]
 
+  seed-mariadb:
+    profiles: [mariadb]
+    build:
+      context: api
+      dockerfile: Dockerfile
+    restart: "no"
+    entrypoint: [/app/seed]
+    env_file: [api/.env.example]
+    environment:
+      APP_ENV: development
+      SEED_PROFILE: ${SEED_PROFILE:-full-local}
+      SEED_ACCOUNT_ID: ${SEED_ACCOUNT_ID:-9987d065-2c1d-5791-b1fe-8ca97ba35895}
+      BOOTSTRAP_EMAIL: ${BOOTSTRAP_EMAIL:-owner@example.com}
+      BOOTSTRAP_PASSWORD: ${BOOTSTRAP_PASSWORD:-}
+      BOOTSTRAP_ACCOUNT_SLUG: ${BOOTSTRAP_ACCOUNT_SLUG:-personal}
+      DB_DRIVER: mysql
+      DB_FLAVOR: mariadb
+      DB_HOST: database
+      DB_PORT: "3306"
+      DB_NAME: go_lang_starter_dev
+      DB_USER: go_lang_starter
+      DB_PASSWORD: development-only-database-password
+    depends_on:
+      migrate-mariadb:
+        condition: service_completed_successfully
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [database]
+
   api-postgres:
     profiles: [postgres]
     build:
@@ -107,8 +167,9 @@ services:
       DB_NAME: go_lang_starter_dev
       DB_USER: go_lang_starter
       DB_PASSWORD: development-only-database-password
+      PUBLIC_ACCOUNT_ID: ${SEED_ACCOUNT_ID:-9987d065-2c1d-5791-b1fe-8ca97ba35895}
     depends_on:
-      migrate-postgres:
+      seed-postgres:
         condition: service_completed_successfully
     ports:
       - 127.0.0.1:8080:8080
@@ -139,8 +200,9 @@ services:
       DB_NAME: go_lang_starter_dev
       DB_USER: go_lang_starter
       DB_PASSWORD: development-only-database-password
+      PUBLIC_ACCOUNT_ID: ${SEED_ACCOUNT_ID:-9987d065-2c1d-5791-b1fe-8ca97ba35895}
     depends_on:
-      migrate-mariadb:
+      seed-mariadb:
         condition: service_completed_successfully
     ports:
       - 127.0.0.1:8080:8080

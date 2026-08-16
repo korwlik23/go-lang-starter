@@ -11,6 +11,9 @@ param(
 
     [string]$AccountSlug = 'personal',
 
+    [ValidateSet('foundation', 'permission-matrix', 'demo-cms', 'full-local')]
+    [string]$SeedProfile = 'full-local',
+
     [switch]$SkipBootstrap,
 
     [switch]$NoBuild,
@@ -102,62 +105,57 @@ if ($otherRunning -contains $otherApiService) {
 }
 
 Push-Location $root
+$previousSeedProfile = [Environment]::GetEnvironmentVariable('SEED_PROFILE', 'Process')
+$previousBootstrapPassword = [Environment]::GetEnvironmentVariable('BOOTSTRAP_PASSWORD', 'Process')
+$previousBootstrapEmail = [Environment]::GetEnvironmentVariable('BOOTSTRAP_EMAIL', 'Process')
+$previousBootstrapSlug = [Environment]::GetEnvironmentVariable('BOOTSTRAP_ACCOUNT_SLUG', 'Process')
 try {
+    $bootstrapFile = Join-Path $root '.env.bootstrap'
+    if ([string]::IsNullOrWhiteSpace($BootstrapPassword) -and (Test-Path -LiteralPath $bootstrapFile)) {
+        $bootstrapValues = @{}
+        foreach ($line in Get-Content -LiteralPath $bootstrapFile) {
+            $parts = $line -split '=', 2
+            if ($parts.Count -eq 2 -and -not $parts[0].Trim().StartsWith('#')) {
+                $bootstrapValues[$parts[0].Trim()] = $parts[1].Trim()
+            }
+        }
+        if ($bootstrapValues.ContainsKey('BOOTSTRAP_PASSWORD')) {
+            $BootstrapPassword = $bootstrapValues['BOOTSTRAP_PASSWORD']
+        }
+        if ($bootstrapValues.ContainsKey('BOOTSTRAP_EMAIL')) {
+            $BootstrapEmail = $bootstrapValues['BOOTSTRAP_EMAIL']
+        }
+        if ($bootstrapValues.ContainsKey('BOOTSTRAP_ACCOUNT_SLUG')) {
+            $AccountSlug = $bootstrapValues['BOOTSTRAP_ACCOUNT_SLUG']
+        }
+    }
+    if ([string]::IsNullOrWhiteSpace($BootstrapPassword)) {
+        $securePassword = Read-Host 'Local seed password (minimum 12 characters)' -AsSecureString
+        $BootstrapPassword = ConvertFrom-SecurePassword -SecurePassword $securePassword
+    }
+    if ($BootstrapPassword.Length -lt 12) {
+        throw 'Seed password must contain at least 12 characters.'
+    }
+    if ($SkipBootstrap) {
+        Write-Warning 'SkipBootstrap is deprecated because the Compose API waits for seed. Using the foundation profile.'
+        $SeedProfile = 'foundation'
+    }
+
+    # Compose interpolates these process values only into the local seed
+    # service. They are restored below and are never written to the repo.
+    [Environment]::SetEnvironmentVariable('SEED_PROFILE', $SeedProfile, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_PASSWORD', $BootstrapPassword, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_EMAIL', $BootstrapEmail, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_ACCOUNT_SLUG', $AccountSlug, 'Process')
+
     $upArguments = @('--profile', $Profile, 'up')
     if (-not $NoBuild) {
         $upArguments += '--build'
     }
     $upArguments += '-d'
 
-    Write-Host "Starting personal starter with $Profile..."
+    Write-Host "Starting personal starter with $Profile and seed profile $SeedProfile..."
     Invoke-Compose -Arguments $upArguments
-
-    if (-not $SkipBootstrap) {
-        $bootstrapFile = Join-Path $root '.env.bootstrap'
-        $useBootstrapFile = [string]::IsNullOrWhiteSpace($BootstrapPassword) -and (Test-Path -LiteralPath $bootstrapFile)
-
-        if ($useBootstrapFile) {
-            $bootstrapPasswordLine = Get-Content -LiteralPath $bootstrapFile | Where-Object { $_ -match '^BOOTSTRAP_PASSWORD=' } | Select-Object -First 1
-            if ([string]::IsNullOrWhiteSpace($bootstrapPasswordLine) -or $bootstrapPasswordLine -match 'replace-with|password-manager-generated') {
-                throw "The password in $bootstrapFile is still a placeholder. Replace it with a value of at least 12 characters."
-            }
-
-            Write-Host 'Running idempotent foundation bootstrap from .env.bootstrap...'
-            Invoke-Compose -Arguments @(
-                '--profile', $Profile,
-                'run', '--rm', '--no-deps',
-                '--env-from-file', $bootstrapFile,
-                '--entrypoint', '/app/bootstrap',
-                $apiService
-            )
-        }
-        else {
-            if ([string]::IsNullOrWhiteSpace($BootstrapPassword)) {
-                $securePassword = Read-Host 'Bootstrap password (minimum 12 characters)' -AsSecureString
-                $BootstrapPassword = ConvertFrom-SecurePassword -SecurePassword $securePassword
-            }
-
-            if ($BootstrapPassword.Length -lt 12) {
-                throw 'Bootstrap password must contain at least 12 characters.'
-            }
-
-            Write-Host "Running idempotent foundation bootstrap for $BootstrapEmail..."
-            Invoke-Compose -Arguments @(
-                '--profile', $Profile,
-                'run', '--rm', '--no-deps',
-                '--env', "BOOTSTRAP_EMAIL=$BootstrapEmail",
-                '--env', "BOOTSTRAP_PASSWORD=$BootstrapPassword",
-                '--env', "BOOTSTRAP_ACCOUNT_SLUG=$AccountSlug",
-                '--env', 'BOOTSTRAP_ACCOUNT_ROLE_NAME=Account Manager',
-                '--env', 'BOOTSTRAP_SYSTEM_ROLE_NAME=System Manager',
-                '--entrypoint', '/app/bootstrap',
-                $apiService
-            )
-        }
-    }
-    else {
-        Write-Host 'Skipping foundation bootstrap by request.'
-    }
 
     if (-not $SkipHealthCheck) {
         Write-Host 'Waiting for API, Admin and Public Site health endpoints...'
@@ -169,5 +167,9 @@ try {
     }
 }
 finally {
+    [Environment]::SetEnvironmentVariable('SEED_PROFILE', $previousSeedProfile, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_PASSWORD', $previousBootstrapPassword, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_EMAIL', $previousBootstrapEmail, 'Process')
+    [Environment]::SetEnvironmentVariable('BOOTSTRAP_ACCOUNT_SLUG', $previousBootstrapSlug, 'Process')
     Pop-Location
 }

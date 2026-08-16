@@ -10,7 +10,7 @@ The script does not modify `D:\infra-stack`; that repository remains the deploym
 orchestration layer. The starter can be copied into an InfraStack project after a
 release is verified.
 
-## Start, migrate and bootstrap
+## Start, migrate and seed
 
 From `D:\go-lang-starter`:
 
@@ -18,9 +18,23 @@ From `D:\go-lang-starter`:
 .\scripts\dev\setup-local.ps1 -Profile mariadb
 ```
 
-The command starts the selected profile, waits for the migration service, runs the
-idempotent foundation bootstrap, then checks API liveness/readiness, Admin login and
-the Public Site `/th/` route.
+The command starts the selected profile, waits for migration, runs the idempotent
+foundation plus the default `full-local` seed, then checks API liveness/readiness,
+Admin login and the Public Site `/th/` route. The Compose dependency order is
+`database → migrate → seed → api`.
+
+Choose a smaller cumulative seed when needed:
+
+```powershell
+.\scripts\dev\setup-local.ps1 -Profile postgres -SeedProfile permission-matrix
+```
+
+The CLI can also be run directly after migration (the foundation step is still
+performed by the command):
+
+```powershell
+docker compose --profile postgres -f compose.dev.yml run --rm seed-postgres
+```
 
 To use PostgreSQL instead:
 
@@ -40,9 +54,9 @@ Copy-Item .env.bootstrap.example .env.bootstrap
 notepad .env.bootstrap
 ```
 
-Set `BOOTSTRAP_EMAIL`, `BOOTSTRAP_PASSWORD`, `BOOTSTRAP_ACCOUNT_SLUG` and the two
-display names, then run setup again. `.env.bootstrap` is ignored by Git and must never
-be committed. The API password policy requires at least 12 characters, so
+Set `BOOTSTRAP_EMAIL`, `BOOTSTRAP_PASSWORD` and `BOOTSTRAP_ACCOUNT_SLUG`, then run
+setup again. `.env.bootstrap` is ignored by Git and must never be committed. The API
+password policy requires at least 12 characters, so
 `password123` is rejected; use a longer development-only value.
 
 If `.env.bootstrap` is absent, the script asks for the password using a secure prompt.
@@ -56,9 +70,27 @@ that command, so prefer the ignored file):
   -BootstrapPassword 'replace-with-a-local-12-character-value'
 ```
 
-Bootstrap is safe to rerun when the same email/account slug and permission projection
-are present. A partial or conflicting foundation fails closed and must be reviewed;
-the script never resets or deletes database data.
+Seed is safe to rerun when the deterministic account and permission projection are
+present. A partial or conflicting foundation fails closed and must be reviewed; the
+script never resets or deletes database data. The demo password is used only for local
+fixtures and is never committed.
+
+The default `full-local` profile creates eight test identities:
+
+| Email | Purpose |
+|---|---|
+| `owner@example.com` | full owner baseline |
+| `author@example.com` | own publishing/media workflow |
+| `reviewer@example.com` | review boundary |
+| `publisher@example.com` | publish/schedule boundary |
+| `translator@example.com` | localization system permissions |
+| `ops@example.com` | operations/settings/audit permissions |
+| `viewer@example.com` | read-only boundary |
+| `disabled@example.com` | login rejection boundary |
+
+All active fixtures use the password supplied through `BOOTSTRAP_PASSWORD`; change it
+locally before sharing a database dump. The seed intentionally creates no sessions,
+recovery tokens, MFA secrets, preview tokens or external service secrets.
 
 ## Verify an already-running stack
 
