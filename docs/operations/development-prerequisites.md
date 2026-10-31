@@ -8,7 +8,7 @@
 
 ค่าที่เลือกอ้างอิงเอกสารทางการ ณ วันที่ตรวจ:
 
-- Go ใช้สาย stable ปัจจุบัน `1.26`; เวอร์ชันติดตั้งเป้าหมายคือ `1.26.5`
+- Go ใช้สาย stable ปัจจุบัน `1.26`; เวอร์ชันติดตั้งเป้าหมายคือ `1.26.10` (แพตช์ CVE-2026-111943 — ห้ามต่ำกว่านี้)
   ตาม [Go release history](https://go.dev/doc/devel/release) ซึ่งระบุด้วยว่าแต่ละ
   major รองรับจนกว่าจะมี major ใหม่กว่าสองรุ่น
 - Node.js ใช้ `24` LTS ไม่ใช้ `26` Current สำหรับ production tooling ตาม
@@ -26,7 +26,7 @@
 | Tool | Command or path | Observed result | Gate |
 |---|---|---|---|
 | Git | `git --version` | `git version 2.53.0.windows.2` | PASS |
-| Go | `go version` | `go1.26.5 windows/amd64` | PASS |
+| Go | `go version` | `go1.26.10 windows/amd64` | PASS |
 | Node.js | `node --version` | `v24.14.1` | PASS — supported LTS major |
 | Corepack | `corepack --version` | `0.34.6` | PASS |
 | pnpm | `pnpm --version` | `11.9.0` | PASS |
